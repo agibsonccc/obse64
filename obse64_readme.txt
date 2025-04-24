@@ -25,7 +25,7 @@ OBSE64 will support the latest version of Oblivion Remastered available on Steam
 - No; the suggested method for extending OBSE64 is to write a plugin. If this does not meet your needs, please email the contact addresses listed below.
 
 * Can I include OBSE64 as part of a mod pack/collection or otherwise rehost the files?
-- No. Providing a link to https://www.nexusmods.com/oblivionremastered/mods/282 is the suggested method of distribution. Exceptions may be given under applicable circumstances; contact us at the email addresses below. This means that if you see this file available for download anywhere other than https://obse.silverlock.org, https://www.github.com/shad0wshayd3-TES4/obse64, or on Nexus by any user other than https://www.nexusmods.com/users/2166624, that service is violating copyright. I don't like having to explicitly spell this out, but my hand has been forced.
+- No. Providing a link to https://www.nexusmods.com/oblivionremastered/mods/282 is the suggested method of distribution. Exceptions may be given under applicable circumstances; contact us at the email addresses below. This means that if you see this file available for download anywhere other than https://obse.silverlock.org, https://www.github.com/ianpatt/obse64, or on Nexus by any user other than https://www.nexusmods.com/users/2166624, that service is violating copyright. I don't like having to explicitly spell this out, but my hand has been forced.
 
 * Where did the log files go?
 - <My Documents>\My Games\Oblivion Remastered\OBSE\Logs\
