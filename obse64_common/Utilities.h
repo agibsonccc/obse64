@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sfse_common/Types.h"
-#include "sfse_common/Relocation.h"
+#include "obse64_common/Types.h"
+#include "obse64_common/Relocation.h"
 #include <string>
 
 // this has been tested to work for non-varargs functions

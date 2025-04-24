@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sfse_common/Types.h"
+#include "obse64_common/Types.h"
 
 class DataStream
 {

@@ -1,6 +1,6 @@
 #include "Options.h"
-#include "sfse_common/Log.h"
-#include "sfse_common/Errors.h"
+#include "obse64_common/Log.h"
+#include "obse64_common/Errors.h"
 #include <Windows.h>
 
 Options g_options;
@@ -212,7 +212,7 @@ void Options::PrintUsage(void)
 {
 	//gLog.SetPrintLevel(IDebugLog::kLevel_VerboseMessage);
 
-	_MESSAGE("usage: sfse_loader [options]");
+	_MESSAGE("usage: obse64_loader [options]");
 	_MESSAGE("");
 	_MESSAGE("options:");
 	_MESSAGE("  -h, -help - print this options list");

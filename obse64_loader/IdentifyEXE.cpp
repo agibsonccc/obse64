@@ -1,7 +1,7 @@
 #include "IdentifyEXE.h"
 #include "LoaderError.h"
-#include "sfse_common/sfse_version.h"
-#include "sfse_common/Log.h"
+#include "obse64_common/obse64_version.h"
+#include "obse64_common/Log.h"
 #include <string>
 #include <Windows.h>
 
@@ -298,9 +298,9 @@ bool IdentifyEXE(const char * procName, bool isEditor, std::string * dllSuffix, 
 	hookInfo->version = version;
 	hookInfo->packedVersion = MAKE_EXE_VERSION(version >> 48, version >> 32, version >> 16);
 
-	if(productName == "SFSE")
+	if(productName == "OBSE64")
 	{
-		_MESSAGE("found an SFSE component");
+		_MESSAGE("found an OBSE64 component");
 		return false;
 	}
 
@@ -325,13 +325,13 @@ bool IdentifyEXE(const char * procName, bool isEditor, std::string * dllSuffix, 
 
 	if(hookInfo->procType == kProcType_WinStore)
 	{
-		PrintLoaderError("The Windows Store (gamepass) version of Starfield is not supported.");
+		PrintLoaderError("The Windows Store (gamepass) version of Oblivion Remastered is not supported.");
 		return false;
 	}
 	
 	if(hookInfo->procType == kProcType_Epic)
 	{
-		PrintLoaderError("The Epic Store version of Starfield is not supported.");
+		PrintLoaderError("The Epic Store version of Oblivion Remastered is not supported.");
 		return false;
 	}
 
@@ -384,7 +384,7 @@ bool IdentifyEXE(const char * procName, bool isEditor, std::string * dllSuffix, 
 			break;
 
 		case kProcType_Packed:
-			PrintLoaderError("Packed versions of Starfield are not supported.");
+			PrintLoaderError("Packed versions of Oblivion Remastered are not supported.");
 			break;
 
 		case kProcType_Unknown:
@@ -438,13 +438,13 @@ bool VersionCheck(const ProcHookInfo & procInfo, u64 RUNTIME_VERSION)
 		{
 			// different build
 			PrintLoaderError(
-				"This version of SFSE is compatible with the %s version of the game.\n"
+				"This version of OBSE64 is compatible with the %s version of the game.\n"
 				"You have the %s version of the game. Please download the correct version from the website.\n"
 				"Runtime: %d.%d.%d\n"
-				"SFSE: %d.%d.%d",
+				"OBSE64: %d.%d.%d",
 				expectedProcTypeName, foundProcTypeName,
 				GET_EXE_VERSION_MAJOR(versionInternal), GET_EXE_VERSION_MINOR(versionInternal), GET_EXE_VERSION_BUILD(versionInternal),
-				SFSE_VERSION_INTEGER, SFSE_VERSION_INTEGER_MINOR, SFSE_VERSION_INTEGER_BETA);
+				OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
 
 			return false;
 		}
@@ -452,35 +452,35 @@ bool VersionCheck(const ProcHookInfo & procInfo, u64 RUNTIME_VERSION)
 
 	if(procInfo.version < kCurVersion)
 	{
-#if SFSE_TARGETING_BETA_VERSION
+#if OBSE64_TARGETING_BETA_VERSION
 		if(versionInternal == CURRENT_RELEASE_RUNTIME)
 			PrintLoaderError(
-				"You are using the version of SFSE intended for the Steam beta branch (%d.%d.%d).\n"
-				"Download and install the non-beta branch version (%s) from http://sfse.silverlock.org/.",
-				SFSE_VERSION_INTEGER, SFSE_VERSION_INTEGER_MINOR, SFSE_VERSION_INTEGER_BETA, CURRENT_RELEASE_SFSE_STR);
+				"You are using the version of OBSE64 intended for the Steam beta branch (%d.%d.%d).\n"
+				"Download and install the non-beta branch version (%s) from http://obse.silverlock.org/.",
+				OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA, CURRENT_RELEASE_OBSE64_STR);
 		else
 			PrintLoaderError(
-				"You are using Starfield version %d.%d.%d, which is out of date and incompatible with this version of SFSE (%d.%d.%d). Update to the latest beta version.",
+				"You are using Oblivion Remastered version %d.%d.%d, which is out of date and incompatible with this version of OBSE64 (%d.%d.%d). Update to the latest beta version.",
 				GET_EXE_VERSION_MAJOR(versionInternal), GET_EXE_VERSION_MINOR(versionInternal), GET_EXE_VERSION_BUILD(versionInternal),
-				SFSE_VERSION_INTEGER, SFSE_VERSION_INTEGER_MINOR, SFSE_VERSION_INTEGER_BETA);
+				OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
 #else
 		PrintLoaderError(
-			"You are using Starfield version %d.%d.%d, which is out of date and incompatible with this version of SFSE (%d.%d.%d). Update to the latest version.",
+			"You are using Oblivion Remastered version %d.%d.%d, which is out of date and incompatible with this version of OBSE64 (%d.%d.%d). Update to the latest version.",
 			GET_EXE_VERSION_MAJOR(versionInternal), GET_EXE_VERSION_MINOR(versionInternal), GET_EXE_VERSION_BUILD(versionInternal),
-			SFSE_VERSION_INTEGER, SFSE_VERSION_INTEGER_MINOR, SFSE_VERSION_INTEGER_BETA);
+			OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
 #endif
 	}
 	else if(procInfo.version > kCurVersion)
 	{
 		PrintLoaderError(
-			"You are using a newer version of Starfield than this version of SFSE supports.\n"
+			"You are using a newer version of Oblivion Remastered than this version of OBSE64 supports.\n"
 			"If this version just came out, please be patient while we update our code.\n"
-			"In the meantime, please check http://sfse.silverlock.org for updates.\n"
+			"In the meantime, please check http://obse.silverlock.org for updates.\n"
 			"Do not email about this!\n"
 			"Runtime: %d.%d.%d\n"
-			"SFSE: %d.%d.%d",
+			"OBSE64: %d.%d.%d",
 			GET_EXE_VERSION_MAJOR(versionInternal), GET_EXE_VERSION_MINOR(versionInternal), GET_EXE_VERSION_BUILD(versionInternal),
-			SFSE_VERSION_INTEGER, SFSE_VERSION_INTEGER_MINOR, SFSE_VERSION_INTEGER_BETA);
+			OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
 	}
 
 	return true;

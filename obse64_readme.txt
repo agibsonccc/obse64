@@ -1,51 +1,40 @@
-Starfield Script Extender v0.2.16 pre-alpha
-by Ian Patterson, Stephen Abel, and Expired
+Oblivion Remastered Script Extender v0.1.0 pre-alpha
+by Ian Patterson
 
-The Starfield Script Extender, or SFSE for short, is a modder's resource that expands the scripting capabilities of Starfield. As the editor is not out, it's mostly a plugin loader for now. Depending on where modders show interest, this will expand to Scaleform and Papyrus (or other things) over time.
+The Oblivion Remastered Script Extender, or OBSE64 for short, is a modder's resource that expands the scripting capabilities of Oblivion Remastered. As the editor is not out, it's mostly a plugin loader for now. Depending on where modders show interest, this will expand to Scaleform and Papyrus (or other things) over time.
 
 [ Compatibility ]
 
-SFSE will support the latest version of Starfield available on Steam, currently 1.14.74. The Gamepass/MS Store/EGS version is unsupported. Do not email asking for support.
+OBSE64 will support the latest version of Oblivion Remastered available on Steam, currently 0.411.140.0. The Gamepass/MS Store/EGS version is unsupported. Do not email asking for support.
 
 [ Installation ]
 
-1. Copy the dll and exe files in to your Starfield folder. This is usually C:\Program Files\Steam\SteamApps\common\Starfield\. Do not put it in your Data folder.
+1. Copy the dll and exe files in to your Oblivion Remastered folder. This is usually C:\Program Files\Steam\SteamApps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64.
 2. Ignore the src folder. It is there for programmers only.
-3. Make sure Steam is running, then launch the game by running sfse_loader.exe.
+3. Make sure Steam is running, then launch the game by running obse64_loader.exe.
 
 [ FAQ ]
 
 * Console version?
 - No, not possible due to restrictions put in place by the manufacturers.
 
-* My virus scanner complains about sfse_loader!
+* My virus scanner complains about obse64_loader!
 - It is not a virus. To extend the game, we use a technique called DLL injection to load our code. Since this technique can also be used by viruses, some badly-written virus scanners assume that any program doing it is a virus. Adding an exception to your scanner's rules may be necessary.
 
-* Can I modify and release my own version of SFSE based on the included source code?
-- No; the suggested method for extending SFSE is to write a plugin. If this does not meet your needs, please email the contact addresses listed below.
+* Can I modify and release my own version of OBSE64 based on the included source code?
+- No; the suggested method for extending OBSE64 is to write a plugin. If this does not meet your needs, please email the contact addresses listed below.
 
-* Can I include SFSE as part of a mod pack/collection or otherwise rehost the files?
-- No. Providing a link to https://www.nexusmods.com/starfield/mods/106 is the suggested method of distribution. Exceptions may be given under applicable circumstances; contact us at the email addresses below. This means that if you see this file available for download anywhere other than https://sfse.silverlock.org, https://www.github.com/ianpatt/sfse, or on Nexus by any user other than https://www.nexusmods.com/users/2166624, that service is violating copyright. I don't like having to explicitly spell this out, but my hand has been forced.
+* Can I include OBSE64 as part of a mod pack/collection or otherwise rehost the files?
+- No. Providing a link to https://www.nexusmods.com/oblivionremastered/mods/282 is the suggested method of distribution. Exceptions may be given under applicable circumstances; contact us at the email addresses below. This means that if you see this file available for download anywhere other than https://obse.silverlock.org, https://www.github.com/shad0wshayd3-TES4/obse64, or on Nexus by any user other than https://www.nexusmods.com/users/2166624, that service is violating copyright. I don't like having to explicitly spell this out, but my hand has been forced.
 
 * Where did the log files go?
-- <My Documents>\My Games\Starfield\SFSE\Logs\
+- <My Documents>\My Games\Oblivion Remastered\OBSE64\Logs\
 
-* Where does the SFSE.ini file go?
-- Data\SFSE\SFSE.ini. The .ini is generally not needed. See the whatsnew for .ini options.
+* Where does the OBSE64.ini file go?
+- Data\OBSE64\OBSE64.ini. The .ini is generally not needed. See the whatsnew for .ini options.
 
-* How do I uninstall SFSE?
-- Delete the .dll and .exe files starting with sfse_ from your Starfield folder.
-
-[ Contact ]
-
-Before contacting, make sure that your game launches properly without SFSE first. If SFSE doesn't appear to be working, follow the steps in the FAQ first, then attach everything from <My Documents>\My Games\Starfield\SFSE\Logs\ to an email.
-
-### MAKE SURE TO INCLUDE YOUR LOG FILES AS ATTACHMENTS ###
-I cannot help you solve load order problems.
-Do not email when a new version of the game is released.
-
-Ian Patterson (ianpatt)
-Send email to ianpatt+sfse [at] gmail [dot] com
+* How do I uninstall OBSE64?
+- Delete the .dll and .exe files starting with obse64_ from your Oblivion Remastered folder.
 
 [ Standard Disclaimer ]
 

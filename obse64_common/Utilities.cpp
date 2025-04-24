@@ -1,6 +1,6 @@
 #include "Utilities.h"
-#include "sfse_common/Log.h"
-#include "sfse_common/Errors.h"
+#include "obse64_common/Log.h"
+#include "obse64_common/Errors.h"
 #include <string>
 #include <Windows.h>
 
@@ -59,7 +59,7 @@ const std::string & getConfigPath()
 		std::string	runtimePath = getRuntimeDirectory();
 		if(!runtimePath.empty())
 		{
-			s_configPath = runtimePath + "Data\\SFSE\\sfse.ini";
+			s_configPath = runtimePath + "OBSE64\\obse64.ini";
 
 			_MESSAGE("config path = %s", s_configPath.c_str());
 		}

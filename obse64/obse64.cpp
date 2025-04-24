@@ -1,25 +1,20 @@
 #include <Windows.h>
 #include <ShlObj.h>
 #include <corecrt_startup.h>
-#include "sfse_common/Log.h"
-#include "sfse_common/sfse_version.h"
-#include "sfse_common/Utilities.h"
-#include "sfse_common/SafeWrite.h"
-#include "sfse_common/BranchTrampoline.h"
-#include "sfse_common/CoreInfo.h"
+#include "obse64_common/Log.h"
+#include "obse64_common/obse64_version.h"
+#include "obse64_common/Utilities.h"
+#include "obse64_common/SafeWrite.h"
+#include "obse64_common/BranchTrampoline.h"
+#include "obse64_common/CoreInfo.h"
 #include "PluginManager.h"
 
-#include "Hooks_Version.h"
 #include "Hooks_Script.h"
-#include "Hooks_Scaleform.h"
-#include "Hooks_Serialization.h"
-#include "Hooks_Data.h"
-#include "Hooks_Command.h"
 
 HINSTANCE g_moduleHandle = nullptr;
 
-void SFSE_Preinit();
-void SFSE_Initialize();
+void OBSE64_Preinit();
+void OBSE64_Initialize();
 
 // api-ms-win-crt-runtime-l1-1-0.dll
 typedef int (*__initterm_e)(_PIFV *, _PIFV *);
@@ -33,7 +28,7 @@ int __initterm_e_Hook(_PIFV * a, _PIFV * b)
 {
 	// could be used for plugin optional preload
 
-	SFSE_Preinit();
+	OBSE64_Preinit();
 
 	return _initterm_e_Original(a, b);
 }
@@ -43,14 +38,14 @@ char * __get_narrow_winmain_command_line_Hook()
 {
 	// the usual load time
 
-	SFSE_Initialize();
+	OBSE64_Initialize();
 
 	return _get_narrow_winmain_command_line_Original();
 }
 
 void installBaseHooks(void)
 {
-	DebugLog::openRelative(CSIDL_MYDOCUMENTS, "\\My Games\\" SAVE_FOLDER_NAME "\\SFSE\\Logs\\sfse.txt");
+	DebugLog::openRelative(CSIDL_MYDOCUMENTS, "\\My Games\\" SAVE_FOLDER_NAME "\\OBSE64\\Logs\\obse64.txt");
 
 	HANDLE exe = GetModuleHandle(nullptr);
 
@@ -90,7 +85,7 @@ void WaitForDebugger(void)
 	Sleep(1000 * 2);
 }
 
-void SFSE_Preinit()
+void OBSE64_Preinit()
 {
 	static bool runOnce = false;
 	if(runOnce) return;
@@ -99,8 +94,8 @@ void SFSE_Preinit()
 	SYSTEMTIME now;
 	GetSystemTime(&now);
 
-	_MESSAGE("SFSE runtime: initialize (version = %d.%d.%d %08X %04d-%02d-%02d %02d:%02d:%02d, os = %s)",
-		SFSE_VERSION_INTEGER, SFSE_VERSION_INTEGER_MINOR, SFSE_VERSION_INTEGER_BETA, RUNTIME_VERSION,
+	_MESSAGE("OBSE64 runtime: initialize (version = %d.%d.%d %08X %04d-%02d-%02d %02d:%02d:%02d, os = %s)",
+		OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA, RUNTIME_VERSION,
 		now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond,
 		getOSInfoStr().c_str());
 
@@ -110,7 +105,7 @@ void SFSE_Preinit()
 #ifdef _DEBUG
 	SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
 
-	WaitForDebugger();
+	// WaitForDebugger();
 #endif
 
 	if(!g_branchTrampoline.create(1024 * 64))
@@ -134,7 +129,7 @@ void SFSE_Preinit()
 	_MESSAGE("preinit complete");
 }
 
-void SFSE_Initialize()
+void OBSE64_Initialize()
 {
 	static bool runOnce = false;
 	if(runOnce) return;
@@ -144,12 +139,7 @@ void SFSE_Initialize()
 	g_pluginManager.installPlugins(PluginManager::kPhase_Load);
 	g_pluginManager.loadComplete();
 
-	Hooks_Version_Apply();
 	Hooks_Script_Apply();
-	Hooks_Scaleform_Apply();
-	Hooks_Serialization_Apply();
-	Hooks_Data_Apply();
-	Hooks_Command_Apply();
 
 	FlushInstructionCache(GetCurrentProcess(), NULL, 0);
 
@@ -159,7 +149,7 @@ void SFSE_Initialize()
 }
 
 extern "C" {
-	void StartSFSE()
+	void StartOBSE64()
 	{
 		installBaseHooks();
 	}
@@ -179,9 +169,9 @@ extern "C" {
 		return TRUE;
 	}
 
-	__declspec(dllexport) SFSECoreVersionData SFSECore_Version =
+	__declspec(dllexport) OBSE64CoreVersionData OBSE64Core_Version =
 	{
-		SFSECoreVersionData::kVersion,
+		OBSE64CoreVersionData::kVersion,
 
 		RUNTIME_VERSION,
 	};

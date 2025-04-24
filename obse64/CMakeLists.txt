@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.18)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/versioning.cmake)
 
 project(
-	sfse
-	VERSION ${SFSE_VERSION_MAJOR}.${SFSE_VERSION_MINOR}.${SFSE_VERSION_PATCH}
+	obse64
+	VERSION ${OBSE64_VERSION_MAJOR}.${OBSE64_VERSION_MINOR}.${OBSE64_VERSION_PATCH}
 	LANGUAGES CXX
 )
 
@@ -26,8 +26,8 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
 
 # ---- Dependencies ----
 
-if (NOT TARGET sfse_common)
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../sfse_common sfse_common)	# bundled
+if (NOT TARGET obse64_common)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../obse64_common obse64_common)	# bundled
 endif()
 
 if (NOT TARGET xbyak)
@@ -42,70 +42,25 @@ file(GLOB sources CONFIGURE_DEPENDS *.cpp)
 source_group(
 	${PROJECT_NAME}
 	FILES
-		sfse.cpp
-		sfse.def
-		sfse_version.rc
+		obse64.cpp
+		obse64.def
+		obse64_version.rc
 )
 
 source_group(
 	${PROJECT_NAME}/api
 	FILES
-		GameChargen.cpp
-		GameChargen.h
-		GameData.cpp
-		GameData.h
 		GameConsole.cpp
 		GameConsole.h
-		GameEvents.h
-		GameExtraData.cpp
-		GameExtraData.h
-		GameFormComponents.h
-		GameForms.cpp
-		GameForms.h
-		GameLock.cpp
-		GameLock.h
-		GameMemory.cpp
-		GameMemory.h
-		GameMenu.h
-		GameObjects.h
-		GameReferences.h
-		GameReflection.h
-		GameRTTI.cpp
-		GameRTTI.h
-		GameRTTI.inl
 		GameScript.cpp
 		GameScript.h
-		GameSettings.cpp
-		GameSettings.h
-		GameStreams.h
-		GameSingleton.h
-		GameTypes.cpp
-		GameTypes.h
-		GameUI.cpp
-		GameUI.h
-		NiExtraData.cpp
-		NiExtraData.h
-		NiObject.cpp
-		NiObject.h
-		NiRTTI.cpp
-		NiRTTI.h
 )
 
 source_group(
 	${PROJECT_NAME}/hooks
 	FILES
-		Hooks_Data.cpp
-		Hooks_Data.h
-		Hooks_Version.cpp
-		Hooks_Version.h
 		Hooks_Script.cpp
 		Hooks_Script.h
-		Hooks_Scaleform.cpp
-		Hooks_Scaleform.h
-		Hooks_Command.cpp
-		Hooks_Command.h
-		Hooks_Serialization.cpp
-		Hooks_Serialization.h
 )
 
 source_group(
@@ -114,41 +69,6 @@ source_group(
 		PluginAPI.h
 		PluginManager.cpp
 		PluginManager.h
-		Serialization.cpp
-		Serialization.h
-)
-
-source_group(
-	${PROJECT_NAME}/netimmerse
-	FILES
-		NiTypes.h
-)
-
-source_group(
-	${PROJECT_NAME}/papyrus/functions
-	FILES
-)
-
-source_group(
-	${PROJECT_NAME}/papyrus/vm
-	FILES
-		PapyrusNativeFunctions.h
-)
-
-source_group(
-	${PROJECT_NAME}/scaleform
-	FILES
-		ScaleformFunctions.h
-		ScaleformLog.h
-		ScaleformMemory.cpp
-		ScaleformMemory.h
-		ScaleformMovie.h
-		ScaleformState.h
-		ScaleformTypes.h
-		ScaleformValue.h
-		ScaleformLoader.h
-		ScaleformManager.h
-		ScaleformTranslator.h
 )
 
 # ---- Create library ----
@@ -158,11 +78,11 @@ add_library(
 	SHARED
 	${headers}
 	${sources}
-	sfse.def
-	sfse_version.rc
+	obse64.def
+	obse64_version.rc
 )
 
-add_library(sfse64::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(obse64::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/configuration.cmake)
 
@@ -195,7 +115,7 @@ target_include_directories(
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC
-		sfse::sfse_common
+		obse64::obse64_common
 		xbyak::xbyak
 )
 
@@ -209,7 +129,7 @@ target_compile_options(
 
 set_target_properties(
 	${PROJECT_NAME}
-	sfse_common
+	obse64_common
 	PROPERTIES
 		MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
 )
@@ -249,7 +169,7 @@ install(
 	EXPORT
 		${PROJECT_NAME}-targets
 	NAMESPACE
-		sfse::
+		obse64::
 	DESTINATION
 		${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )

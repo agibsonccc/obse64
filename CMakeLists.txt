@@ -18,14 +18,14 @@ endif()
 
 # ---- Add sub projects ----
 
-if (NOT TARGET sfse)
-	add_subdirectory(sfse)
+if (NOT TARGET obse64)
+	add_subdirectory(obse64)
 endif()
 
-if (NOT TARGET sfse_common)
-	add_subdirectory(sfse_common)
+if (NOT TARGET obse64_common)
+	add_subdirectory(obse64_common)
 endif()
 
-if (NOT TARGET sfse_loader)
-	add_subdirectory(sfse_loader)
+if (NOT TARGET obse64_loader)
+	add_subdirectory(obse64_loader)
 endif()

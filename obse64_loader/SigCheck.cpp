@@ -1,7 +1,7 @@
 #include "SigCheck.h"
-#include "sfse_common/Utilities.h"
-#include "sfse_common/Log.h"
-#include "sfse_common/Errors.h"
+#include "obse64_common/Utilities.h"
+#include "obse64_common/Log.h"
+#include "obse64_common/Errors.h"
 #include <Windows.h>
 #include <cstring>
 #include <vector>

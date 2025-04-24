@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "sfse_common/Types.h"
+#include "obse64_common/Types.h"
 
 void safeWriteBuf(uintptr_t addr, void * data, size_t len);
 void safeWrite8(uintptr_t addr, u8 data);

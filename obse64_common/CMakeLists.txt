@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.18)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/versioning.cmake)
 
 project(
-	sfse_common
-	VERSION ${SFSE_VERSION_MAJOR}.${SFSE_VERSION_MINOR}.${SFSE_VERSION_PATCH}
+	obse64_common
+	VERSION ${OBSE64_VERSION_MAJOR}.${OBSE64_VERSION_MINOR}.${OBSE64_VERSION_PATCH}
 	LANGUAGES CXX
 )
 
@@ -40,7 +40,7 @@ add_library(
 	${sources}
 )
 
-add_library(sfse::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(obse64::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_compile_features(
 	${PROJECT_NAME}
@@ -95,7 +95,7 @@ install(
 	EXPORT
 		${PROJECT_NAME}-targets
 	NAMESPACE
-		sfse::
+		obse64::
 	DESTINATION
 		${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )

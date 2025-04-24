@@ -5,8 +5,8 @@
 #include <mutex>
 #include <unordered_map>
 
-#include "sfse/PluginAPI.h"
-#include "sfse_common/Types.h"
+#include "obse64/PluginAPI.h"
+#include "obse64_common/Types.h"
 
 #include <Windows.h>
 
@@ -41,7 +41,7 @@ public:
 	static const PluginInfo *	getPluginInfo(const char* name);
 
 	static bool dispatchMessage(PluginHandle sender, u32 messageType, void * data, u32 dataLen, const char* receiver);
-	static bool	registerListener(PluginHandle listener, const char* sender, SFSEMessagingInterface::EventCallback handler);
+	static bool	registerListener(PluginHandle listener, const char* sender, OBSE64MessagingInterface::EventCallback handler);
 
 private:
 	struct LoadedPlugin
@@ -54,9 +54,9 @@ private:
 		PluginInfo	info;
 		u32			internalHandle = 0;
 
-		SFSEPluginVersionData	version;
+		OBSE64PluginVersionData	version;
 
-		_SFSEPlugin_Load	load[kPhase_Num] = { nullptr };
+		_OBSE64Plugin_Load	load[kPhase_Num] = { nullptr };
 
 		const char		* errorState = nullptr;
 		u32				errorCode = 0;
@@ -68,10 +68,10 @@ private:
 	bool	findPluginDirectory(void);
 	void	scanPlugins(void);
 
-	const char *	safeCallLoadPlugin(LoadedPlugin * plugin, const SFSEInterface * sfse, u32 phase);
+	const char *	safeCallLoadPlugin(LoadedPlugin * plugin, const OBSE64Interface * obse64, u32 phase);
 
-	void			sanitize(SFSEPluginVersionData * version);
-	const char *	checkPluginCompatibility(const SFSEPluginVersionData & version);
+	void			sanitize(OBSE64PluginVersionData * version);
+	const char *	checkPluginCompatibility(const OBSE64PluginVersionData & version);
 	const char *	checkAddressLibrary(void);
 
 	void			logPluginLoadError(const LoadedPlugin & plugin, const char * errStr, u32 errCode = 0, bool isError = true);
@@ -109,7 +109,7 @@ private:
 extern BranchTrampolineManager g_branchTrampolineManager;
 extern BranchTrampolineManager g_localTrampolineManager;
 
-void * AllocateFromSFSEBranchPool(PluginHandle plugin, size_t size);
-void * AllocateFromSFSELocalPool(PluginHandle plugin, size_t size);
+void * AllocateFromOBSE64BranchPool(PluginHandle plugin, size_t size);
+void * AllocateFromOBSE64LocalPool(PluginHandle plugin, size_t size);
 
 extern PluginManager	g_pluginManager;

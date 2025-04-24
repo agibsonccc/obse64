@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.18)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/versioning.cmake)
 
 project(
-	sfse_loader
-	VERSION 1.1.1
+	obse64_loader
+	VERSION 1.0.0
 	LANGUAGES CXX
 )
 
@@ -26,8 +26,8 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
 
 # ---- Dependencies ----
 
-if (NOT TARGET sfse_common)
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../sfse_common sfse_common)	# bundled
+if (NOT TARGET obse64_common)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../obse64_common obse64_common)	# bundled
 endif()
 
 # ---- Add source files ----
@@ -40,8 +40,8 @@ source_group(
 	FILES
 		${headers}
 		${sources}
-		sfse_loader_version.rc
-		sfse_loader.manifest
+		obse64_loader_version.rc
+		obse64_loader.manifest
 )
 
 # ---- Create library ----
@@ -50,11 +50,11 @@ add_executable(
 	${PROJECT_NAME}
 	${headers}
 	${sources}
-	sfse_loader_version.rc
-	sfse_loader.manifest
+	obse64_loader_version.rc
+	obse64_loader.manifest
 )
 
-add_executable(sfse::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_executable(obse64::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/configuration.cmake)
 
@@ -74,7 +74,7 @@ target_include_directories(
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC
-		sfse::sfse_common
+		obse64::obse64_common
 		Shlwapi.lib
 		Version.lib
 		Wintrust.lib
@@ -85,7 +85,7 @@ target_link_libraries(
 
 set_target_properties(
 	${PROJECT_NAME}
-	sfse_common
+	obse64_common
 	PROPERTIES
 		MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
 )

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "sfse_common/Relocation.h"
-#include "sfse_common/Utilities.h"
+#include "obse64_common/Relocation.h"
+#include "obse64_common/Utilities.h"
 
-class ConsoleLog
+inline RelocPtr <std::uintptr_t> _Console_Print(0x06593FA0);
+
+template <class... Args>
+void Console_Print(const char* fmt, Args... args)
 {
-public:
-	DEFINE_MEMBER_FN_2(VPrint, void, 0x02AE80F8, const char* fmt, va_list args);
-};
-
-extern RelocPtr <ConsoleLog*> g_console;
-
-void Console_Print(const char* fmt, ...);
+	using func_t = void(*)(const char*, ...);
+	auto func = reinterpret_cast<func_t>(_Console_Print.getPtr());
+	return func(fmt, args...);
+}

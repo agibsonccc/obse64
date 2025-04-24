@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-struct SFSECoreVersionData
+struct OBSE64CoreVersionData
 {
 	enum
 	{

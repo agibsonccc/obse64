@@ -2,7 +2,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <Windows.h>
-#include "sfse_common/Log.h"
+#include "obse64_common/Log.h"
 
 void PrintLoaderError(const char * fmt, ...)
 {
@@ -18,5 +18,5 @@ void PrintLoaderError(const char * fmt, ...)
 	vsprintf_s(buf, sizeof(buf), fmt, args);
 	va_end(args);
 
-	MessageBox(NULL, buf, "SFSE Loader", MB_OK | MB_ICONEXCLAMATION);
+	MessageBox(NULL, buf, "OBSE64 Loader", MB_OK | MB_ICONEXCLAMATION);
 }

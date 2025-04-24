@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sfse_common/Types.h"
+#include "obse64_common/Types.h"
 #include <string>
 
 class Options

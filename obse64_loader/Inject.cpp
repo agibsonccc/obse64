@@ -1,7 +1,7 @@
 #include "LoaderError.h"
 #include "IdentifyEXE.h"
-#include "sfse_common/FileStream.h"
-#include "sfse_common/Log.h"
+#include "obse64_common/FileStream.h"
+#include "obse64_common/Log.h"
 #include <Windows.h>
 
 // remote thread creation

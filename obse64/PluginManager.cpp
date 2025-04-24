@@ -1,14 +1,11 @@
 #include "PluginManager.h"
-#include "sfse_common/DirectoryIterator.h"
-#include "sfse_common/FileStream.h"
-#include "sfse_common/Utilities.h"
-#include "sfse_common/sfse_version.h"
-#include "sfse_common/BranchTrampoline.h"
-#include "sfse_common/Log.h"
-#include "sfse_common/Errors.h"
-
-#include "sfse/Hooks_Scaleform.h"
-#include "sfse/Hooks_Command.h"
+#include "obse64_common/DirectoryIterator.h"
+#include "obse64_common/FileStream.h"
+#include "obse64_common/Utilities.h"
+#include "obse64_common/obse64_version.h"
+#include "obse64_common/BranchTrampoline.h"
+#include "obse64_common/Log.h"
+#include "obse64_common/Errors.h"
 
 PluginManager	g_pluginManager;
 
@@ -19,43 +16,41 @@ u32								s_trampolineLog = 1;
 BranchTrampolineManager g_branchTrampolineManager(g_branchTrampoline);
 BranchTrampolineManager g_localTrampolineManager(g_localTrampoline);
 
-static const SFSEInterface g_SFSEInterface =
+static const OBSE64Interface g_OBSE64Interface =
 {
-	PACKED_SFSE_VERSION,
+	PACKED_OBSE64_VERSION,
 	RUNTIME_VERSION,
-	SFSEInterface::kInterfaceVersion,
+	OBSE64Interface::kInterfaceVersion,
 
 	PluginManager::queryInterface,
 	PluginManager::getPluginHandle,
 	PluginManager::getPluginInfo
 };
 
-static const SFSETrampolineInterface g_SFSETrampolineInterface =
+static const OBSE64TrampolineInterface g_OBSE64TrampolineInterface =
 {
-	SFSETrampolineInterface::kInterfaceVersion,
-	AllocateFromSFSEBranchPool,
-	AllocateFromSFSELocalPool
+	OBSE64TrampolineInterface::kInterfaceVersion,
+	AllocateFromOBSE64BranchPool,
+	AllocateFromOBSE64LocalPool
 };
 
-static SFSEMessagingInterface g_SFSEMessagingInterface =
+static OBSE64MessagingInterface g_OBSE64MessagingInterface =
 {
-	SFSEMessagingInterface::kInterfaceVersion,
+	OBSE64MessagingInterface::kInterfaceVersion,
 	PluginManager::registerListener,
 	PluginManager::dispatchMessage,
 };
 
-static const SFSEMenuInterface g_SFSEMenuInterface =
+static const OBSE64MenuInterface g_OBSE64MenuInterface =
 {
-	SFSEMenuInterface::kInterfaceVersion,
-	RegisterMenuPlugin,
-	RegisterManagerPlugin,
+	OBSE64MenuInterface::kInterfaceVersion,
 };
 
-static const SFSETaskInterface g_SFSETaskInterface =
+static const OBSE64TaskInterface g_OBSE64TaskInterface =
 {
-	SFSETaskInterface::kInterfaceVersion,
-	TaskInterface::addTask,
-	TaskInterface::addTaskPermanent
+	OBSE64TaskInterface::kInterfaceVersion,
+	// TaskInterface::addTask,
+	// TaskInterface::addTaskPermanent
 };
 
 PluginManager::PluginManager()
@@ -131,12 +126,12 @@ void PluginManager::installPlugins(u32 phase)
 
 		if(plugin.handle)
 		{
-			plugin.load[phase] = (_SFSEPlugin_Load)GetProcAddress(plugin.handle, (phase == kPhase_Preload) ? "SFSEPlugin_Preload" : "SFSEPlugin_Load");
+			plugin.load[phase] = (_OBSE64Plugin_Load)GetProcAddress(plugin.handle, (phase == kPhase_Preload) ? "OBSE64Plugin_Preload" : "OBSE64Plugin_Load");
 			if(plugin.load)
 			{
 				const char * loadStatus = nullptr;
 
-				loadStatus = safeCallLoadPlugin(&plugin, &g_SFSEInterface, phase);
+				loadStatus = safeCallLoadPlugin(&plugin, &g_OBSE64Interface, phase);
 
 				if(!loadStatus)
 				{
@@ -149,7 +144,7 @@ void PluginManager::installPlugins(u32 phase)
 			}
 			else
 			{
-				logPluginLoadError(plugin, "does not appear to be an SFSE plugin");
+				logPluginLoadError(plugin, "does not appear to be an OBSE64 plugin");
 			}
 		}
 
@@ -197,9 +192,9 @@ void PluginManager::loadComplete()
 	}
 
 	// alert any listeners that plugin load has finished
-	dispatchMessage(0, SFSEMessagingInterface::kMessage_PostLoad, nullptr, 0, nullptr);
+	dispatchMessage(0, OBSE64MessagingInterface::kMessage_PostLoad, nullptr, 0, nullptr);
 	// second post-load dispatch
-	dispatchMessage(0, SFSEMessagingInterface::kMessage_PostPostLoad, nullptr, 0, nullptr);
+	dispatchMessage(0, OBSE64MessagingInterface::kMessage_PostPostLoad, nullptr, 0, nullptr);
 }
 
 void PluginManager::deinit()
@@ -245,14 +240,14 @@ const char * PluginManager::pluginNameFromHandle(PluginHandle handle) const
 	if(handle > 0 && handle <= m_plugins.size())
 		return (m_plugins[handle - 1].version.name);
 	else if(handle == 0)
-		return "SFSE";
+		return "OBSE64";
 
 	return nullptr;
 }
 
 PluginHandle PluginManager::lookupHandleFromName(const char * pluginName) const
 {
-	if(!_stricmp("SFSE", pluginName))
+	if(!_stricmp("OBSE64", pluginName))
 		return 0;
 
 	u32	idx = 1;
@@ -275,16 +270,16 @@ void * PluginManager::queryInterface(u32 id)
 	switch(id)
 	{
 	case kInterface_Messaging:
-		result = (void *)&g_SFSEMessagingInterface;
+		result = (void *)&g_OBSE64MessagingInterface;
 		break;
 	case kInterface_Trampoline:
-		result = (void *)&g_SFSETrampolineInterface;
+		result = (void *)&g_OBSE64TrampolineInterface;
 		break;
 	case kInterface_Menu:
-		result = (void*)&g_SFSEMenuInterface;
+		result = (void*)&g_OBSE64MenuInterface;
 		break;
 	case kInterface_Task:
-		result = (void*)&g_SFSETaskInterface;
+		result = (void*)&g_OBSE64TaskInterface;
 		break;
 
 	default:
@@ -297,7 +292,7 @@ void * PluginManager::queryInterface(u32 id)
 
 PluginHandle PluginManager::getPluginHandle(void)
 {
-	ASSERT_STR(s_currentPluginHandle, "A plugin has called SFSEInterface::GetPluginHandle outside of its Query/Load handlers");
+	ASSERT_STR(s_currentPluginHandle, "A plugin has called OBSE64Interface::GetPluginHandle outside of its Query/Load handlers");
 
 	return s_currentPluginHandle;
 }
@@ -311,12 +306,12 @@ bool PluginManager::findPluginDirectory(void)
 {
 	bool	result = false;
 
-	// find the path <runtime directory>/data/sfse/
+	// find the path <runtime directory>/obse64/
 	std::string	runtimeDirectory = getRuntimeDirectory();
 
 	if(!runtimeDirectory.empty())
 	{
-		m_pluginDirectory = runtimeDirectory + "Data\\SFSE\\Plugins\\";
+		m_pluginDirectory = runtimeDirectory + "OBSE64\\Plugins\\";
 		result = true;
 	}
 
@@ -343,7 +338,7 @@ void PluginManager::scanPlugins(void)
 		{
 			if(is64BitDLL(resourceHandle))
 			{
-				auto * version = (const SFSEPluginVersionData *)getResourceLibraryProcAddress(resourceHandle, "SFSEPlugin_Version");
+				auto * version = (const OBSE64PluginVersionData *)getResourceLibraryProcAddress(resourceHandle, "OBSE64Plugin_Version");
 				if(version)
 				{
 					plugin.version = *version;
@@ -357,8 +352,8 @@ void PluginManager::scanPlugins(void)
 						plugin.internalHandle = handleIdx;
 						handleIdx++;
 
-						plugin.hasLoad = getResourceLibraryProcAddress(resourceHandle, "SFSEPlugin_Load") != nullptr;
-						plugin.hasPreload = getResourceLibraryProcAddress(resourceHandle, "SFSEPlugin_Preload") != nullptr;
+						plugin.hasLoad = getResourceLibraryProcAddress(resourceHandle, "OBSE64Plugin_Load") != nullptr;
+						plugin.hasPreload = getResourceLibraryProcAddress(resourceHandle, "OBSE64Plugin_Preload") != nullptr;
 
 						m_plugins.push_back(plugin);
 					}
@@ -399,7 +394,7 @@ const char * PluginManager::checkAddressLibrary(void)
 	const char * buildType = "";
 
 	char fileName[256];
-	_snprintf_s(fileName, 256, "Data\\SFSE\\Plugins\\versionlib-%d-%d-%d-%d%s.bin",
+	_snprintf_s(fileName, 256, "OBSE64\\Plugins\\versionlib-%d-%d-%d-%d%s.bin",
 		GET_EXE_VERSION_MAJOR(RUNTIME_VERSION),
 		GET_EXE_VERSION_MINOR(RUNTIME_VERSION),
 		GET_EXE_VERSION_BUILD(RUNTIME_VERSION),
@@ -417,11 +412,11 @@ const char * PluginManager::checkAddressLibrary(void)
 	return s_status;
 }
 
-const char * PluginManager::safeCallLoadPlugin(LoadedPlugin * plugin, const SFSEInterface * sfse, u32 phase)
+const char * PluginManager::safeCallLoadPlugin(LoadedPlugin * plugin, const OBSE64Interface * obse64, u32 phase)
 {
 	__try
 	{
-		if(!plugin->load[phase](sfse))
+		if(!plugin->load[phase](obse64))
 		{
 			return "reported as incompatible during load";
 		}
@@ -435,7 +430,7 @@ const char * PluginManager::safeCallLoadPlugin(LoadedPlugin * plugin, const SFSE
 	return nullptr;
 }
 
-void PluginManager::sanitize(SFSEPluginVersionData * version)
+void PluginManager::sanitize(OBSE64PluginVersionData * version)
 {
 	version->name[sizeof(version->name) - 1] = 0;
 	version->author[sizeof(version->author) - 1] = 0;
@@ -458,25 +453,10 @@ struct PluginCompatEntry
 
 static const PluginCompatEntry	kPluginCompatList[] =
 {
-	{	"BakaAchievementEnabler",	MAKE_EXE_VERSION(2, 0, 0),		"broken before plugin version 2.0.0",	kCompat_BlockFromRuntime	},
-	{	"BakaKillMyGames",			MAKE_EXE_VERSION(2, 0, 0),		"broken before plugin version 2.0.0",	kCompat_BlockFromRuntime	},
-	{	"BakaQuitGameFix",			MAKE_EXE_VERSION(2, 0, 0),		"broken before plugin version 2.0.0",	kCompat_BlockFromRuntime	},
-	{	"BakaQuickFullSaves",		MAKE_EXE_VERSION(2, 0, 0),		"broken before plugin version 2.0.0",	kCompat_BlockFromRuntime	},
-
-	// version data doesn't match the version listed on nexus, have contacted the author to update this
-	{	"StarfieldRadio",			10001,		"crashes due to bad version data (update past version 1.0.3)",		kCompat_BlockFromRuntime	},
-
-	{	"SaveTweaks",				4,			"crashes due to bad version data (update past version 3)",			kCompat_BlockFromRuntime	},
-
-	{	"Starfield-NoAffinityLoss",	10301,		"crashes due to bad version data (update past version 1.3.0)",		kCompat_BlockFromRuntime	},
-
-	// didn't set up version data correctly and implemented its own version check
-	{	"Starfield Engine Fixes - SFSE Plugin by LarannKiar",	0,	"not version independent",	kCompat_NotVersionIndependent },
-
 	{	nullptr, 0, nullptr }
 };
 
-const char * PluginManager::checkPluginCompatibility(const SFSEPluginVersionData & version)
+const char * PluginManager::checkPluginCompatibility(const OBSE64PluginVersionData & version)
 {
 	__try
 	{
@@ -523,11 +503,11 @@ const char * PluginManager::checkPluginCompatibility(const SFSEPluginVersionData
 
 		// version compatibility means both address independence and structure independence
 		bool hasAddressIndependence = version.addressIndependence &
-			(SFSEPluginVersionData::kAddressIndependence_Signatures |
-			SFSEPluginVersionData::kAddressIndependence_AddressLibrary);
+			(OBSE64PluginVersionData::kAddressIndependence_Signatures |
+			OBSE64PluginVersionData::kAddressIndependence_AddressLibrary);
 		bool hasStructureIndependence = version.structureIndependence &
-			(SFSEPluginVersionData::kStructureIndependence_NoStructs |
-			SFSEPluginVersionData::kStructureIndependence_1_14_70_Layout);
+			(OBSE64PluginVersionData::kStructureIndependence_NoStructs |
+			OBSE64PluginVersionData::kStructureIndependence_InitialLayout);
 
 		bool versionIndependent = hasAddressIndependence && hasStructureIndependence;
 
@@ -540,7 +520,7 @@ const char * PluginManager::checkPluginCompatibility(const SFSEPluginVersionData
 			versionIndependent = false;
 
 		// verify that address library is there to centralize error message
-		if(version.addressIndependence & SFSEPluginVersionData::kAddressIndependence_AddressLibrary)
+		if(version.addressIndependence & OBSE64PluginVersionData::kAddressIndependence_AddressLibrary)
 		{
 			const char * result = checkAddressLibrary();
 			if(result) return result;
@@ -573,7 +553,7 @@ const char * PluginManager::checkPluginCompatibility(const SFSEPluginVersionData
 		}
 
 		// SE version compatibility
-		if(version.seVersionRequired > PACKED_SFSE_VERSION)
+		if(version.seVersionRequired > PACKED_OBSE64_VERSION)
 		{
 			return "disabled, requires newer script extender";
 		}
@@ -616,7 +596,6 @@ struct BetterPluginName
 // some plugins have non-descriptive names resulting in bad bug reports
 static const BetterPluginName kBetterPluginNames[] =
 {
-	{ "sfee.dll", "CharGenMenu" },
 	{ nullptr, nullptr }
 };
 
@@ -686,9 +665,9 @@ void PluginManager::reportPluginErrors()
 	message += "\nExit game? (yes highly suggested)";
 
 	int result = MessageBox(0, message.c_str(),
-		"SFSE Plugin Loader (" __PREPRO_TOKEN_STR__(SFSE_VERSION_INTEGER) "."
-		__PREPRO_TOKEN_STR__(SFSE_VERSION_INTEGER_MINOR) "."
-		__PREPRO_TOKEN_STR__(SFSE_VERSION_INTEGER_BETA) ")",
+		"OBSE64 Plugin Loader (" __PREPRO_TOKEN_STR__(OBSE64_VERSION_INTEGER) "."
+		__PREPRO_TOKEN_STR__(OBSE64_VERSION_INTEGER_MINOR) "."
+		__PREPRO_TOKEN_STR__(OBSE64_VERSION_INTEGER_BETA) ")",
 		MB_YESNO);
 
 	if(result == IDYES)
@@ -701,12 +680,12 @@ void PluginManager::reportPluginErrors()
 void PluginManager::updateAddressLibraryPrompt()
 {
 	int result = MessageBox(0,
-		"DLL plugins you have installed require a new version of the Address Library. Either this is a new install, or Starfield was just updated. Visit the Address Library webpage for updates?",
-		"SFSE Plugin Loader", MB_YESNO);
+		"DLL plugins you have installed require a new version of the Address Library. Either this is a new install, or Oblivion Remastered was just updated. Visit the Address Library webpage for updates?",
+		"OBSE64 Plugin Loader", MB_YESNO);
 
 	if(result == IDYES)
 	{
-		ShellExecute(0, nullptr, "https://www.nexusmods.com/starfield/mods/3256", nullptr, nullptr, 0);
+		ShellExecute(0, nullptr, "https://www.nexusmods.com/oblivionremastered/mods/0", nullptr, nullptr, 0);
 		TerminateProcess(GetCurrentProcess(), 0);
 	}
 }
@@ -714,13 +693,13 @@ void PluginManager::updateAddressLibraryPrompt()
 // Plugin communication interface
 struct PluginListener {
 	PluginHandle	listener;
-	SFSEMessagingInterface::EventCallback	handleMessage;
+	OBSE64MessagingInterface::EventCallback	handleMessage;
 };
 
 typedef std::vector<std::vector<PluginListener> > PluginListeners;
 static PluginListeners s_pluginListeners;
 
-bool PluginManager::registerListener(PluginHandle listener, const char* sender, SFSEMessagingInterface::EventCallback handler)
+bool PluginManager::registerListener(PluginHandle listener, const char* sender, OBSE64MessagingInterface::EventCallback handler)
 {
 	// because this can be called while plugins are loading, gotta make sure number of plugins hasn't increased
 	u32 numPlugins = g_pluginManager.numPlugins() + 1;
@@ -826,7 +805,7 @@ bool PluginManager::dispatchMessage(PluginHandle sender, u32 messageType, void *
 		return false;
 	for (std::vector<PluginListener>::iterator iter = s_pluginListeners[sender].begin(); iter != s_pluginListeners[sender].end(); ++iter)
 	{
-		SFSEMessagingInterface::Message msg;
+		OBSE64MessagingInterface::Message msg;
 		msg.data = data;
 		msg.type = messageType;
 		msg.sender = senderName;
@@ -873,7 +852,7 @@ inline void * BranchTrampolineManager::allocate(PluginHandle plugin, size_t size
 }
 
 
-void * AllocateFromSFSEBranchPool(PluginHandle plugin, size_t size)
+void * AllocateFromOBSE64BranchPool(PluginHandle plugin, size_t size)
 {
 	if (s_trampolineLog) {
 		_DMESSAGE("plugin %d allocated %lld bytes from branch pool", plugin, size);
@@ -881,7 +860,7 @@ void * AllocateFromSFSEBranchPool(PluginHandle plugin, size_t size)
 	return g_branchTrampolineManager.allocate(plugin, size);
 }
 
-void * AllocateFromSFSELocalPool(PluginHandle plugin, size_t size)
+void * AllocateFromOBSE64LocalPool(PluginHandle plugin, size_t size)
 {
 	if (s_trampolineLog) {
 		_DMESSAGE("plugin %d allocated %lld bytes from local pool", plugin, size);
