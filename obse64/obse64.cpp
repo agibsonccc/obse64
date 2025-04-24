@@ -45,7 +45,7 @@ char * __get_narrow_winmain_command_line_Hook()
 
 void installBaseHooks(void)
 {
-	DebugLog::openRelative(CSIDL_MYDOCUMENTS, "\\My Games\\" SAVE_FOLDER_NAME "\\OBSE64\\Logs\\obse64.txt");
+	DebugLog::openRelative(CSIDL_MYDOCUMENTS, "\\My Games\\" SAVE_FOLDER_NAME "\\OBSE\\Logs\\obse64.txt");
 
 	HANDLE exe = GetModuleHandle(nullptr);
 
@@ -95,7 +95,7 @@ void OBSE64_Preinit()
 	GetSystemTime(&now);
 
 	_MESSAGE("OBSE64 runtime: initialize (version = %d.%d.%d %08X %04d-%02d-%02d %02d:%02d:%02d, os = %s)",
-		OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA, RUNTIME_VERSION,
+		OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA, RUNTIME_VERSION,
 		now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond,
 		getOSInfoStr().c_str());
 
@@ -169,9 +169,9 @@ extern "C" {
 		return TRUE;
 	}
 
-	__declspec(dllexport) OBSE64CoreVersionData OBSE64Core_Version =
+	__declspec(dllexport) OBSECoreVersionData OBSECore_Version =
 	{
-		OBSE64CoreVersionData::kVersion,
+		OBSECoreVersionData::kVersion,
 
 		RUNTIME_VERSION,
 	};

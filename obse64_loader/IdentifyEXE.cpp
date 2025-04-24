@@ -444,7 +444,7 @@ bool VersionCheck(const ProcHookInfo & procInfo, u64 RUNTIME_VERSION)
 				"OBSE64: %d.%d.%d",
 				expectedProcTypeName, foundProcTypeName,
 				GET_EXE_VERSION_MAJOR(versionInternal), GET_EXE_VERSION_MINOR(versionInternal), GET_EXE_VERSION_BUILD(versionInternal),
-				OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
+				OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA);
 
 			return false;
 		}
@@ -452,22 +452,22 @@ bool VersionCheck(const ProcHookInfo & procInfo, u64 RUNTIME_VERSION)
 
 	if(procInfo.version < kCurVersion)
 	{
-#if OBSE64_TARGETING_BETA_VERSION
+#if OBSE_TARGETING_BETA_VERSION
 		if(versionInternal == CURRENT_RELEASE_RUNTIME)
 			PrintLoaderError(
 				"You are using the version of OBSE64 intended for the Steam beta branch (%d.%d.%d).\n"
 				"Download and install the non-beta branch version (%s) from http://obse.silverlock.org/.",
-				OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA, CURRENT_RELEASE_OBSE64_STR);
+				OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA, CURRENT_RELEASE_OBSE_STR);
 		else
 			PrintLoaderError(
 				"You are using Oblivion Remastered version %d.%d.%d, which is out of date and incompatible with this version of OBSE64 (%d.%d.%d). Update to the latest beta version.",
 				GET_EXE_VERSION_MAJOR(versionInternal), GET_EXE_VERSION_MINOR(versionInternal), GET_EXE_VERSION_BUILD(versionInternal),
-				OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
+				OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA);
 #else
 		PrintLoaderError(
 			"You are using Oblivion Remastered version %d.%d.%d, which is out of date and incompatible with this version of OBSE64 (%d.%d.%d). Update to the latest version.",
 			GET_EXE_VERSION_MAJOR(versionInternal), GET_EXE_VERSION_MINOR(versionInternal), GET_EXE_VERSION_BUILD(versionInternal),
-			OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
+			OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA);
 #endif
 	}
 	else if(procInfo.version > kCurVersion)
@@ -480,7 +480,7 @@ bool VersionCheck(const ProcHookInfo & procInfo, u64 RUNTIME_VERSION)
 			"Runtime: %d.%d.%d\n"
 			"OBSE64: %d.%d.%d",
 			GET_EXE_VERSION_MAJOR(versionInternal), GET_EXE_VERSION_MINOR(versionInternal), GET_EXE_VERSION_BUILD(versionInternal),
-			OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
+			OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA);
 	}
 
 	return true;

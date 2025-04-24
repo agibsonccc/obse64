@@ -59,7 +59,7 @@ const std::string & getConfigPath()
 		std::string	runtimePath = getRuntimeDirectory();
 		if(!runtimePath.empty())
 		{
-			s_configPath = runtimePath + "OBSE64\\obse64.ini";
+			s_configPath = runtimePath + "OBSE\\obse.ini";
 
 			_MESSAGE("config path = %s", s_configPath.c_str());
 		}

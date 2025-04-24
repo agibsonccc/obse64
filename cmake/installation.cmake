@@ -1,6 +1,6 @@
-option(OBSE64_COPY_OUTPUT "Copies output files to the Oblivion Remastered directory" OFF)
+option(OBSE_COPY_OUTPUT "Copies output files to the Oblivion Remastered directory" OFF)
 
-if (OBSE64_COPY_OUTPUT)
+if (OBSE_COPY_OUTPUT)
 	add_custom_command(
 		TARGET ${PROJECT_NAME}
 		POST_BUILD

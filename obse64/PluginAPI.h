@@ -33,7 +33,7 @@ enum
 	kInterface_Max,
 };
 
-struct OBSE64Interface
+struct OBSEInterface
 {
 	enum
 	{
@@ -71,7 +71,7 @@ struct OBSE64Interface
  *	Calling RegisterListener() or Dispatch() during plugin load is not advised as the requested plugin
  *	may not yet be loaded at that point. Instead, if you wish to register as a listener or dispatch a
  *	message immediately after plugin load, use RegisterListener() during load to register to receive
- *	messages from OBSE64 (sender name: "OBSE64"). You will then receive a message from OBSE64 once 
+ *	messages from OBSE64 (sender name: "OBSE"). You will then receive a message from OBSE64 once 
  *	all plugins have been loaded, at which point it is safe to establish communications between
  *	plugins.
  *
@@ -81,7 +81,7 @@ struct OBSE64Interface
  *
  *********************************************************************************************/
 
-struct OBSE64MessagingInterface
+struct OBSEMessagingInterface
 {
 	struct Message {
 		const char		* sender;
@@ -96,7 +96,7 @@ struct OBSE64MessagingInterface
 		kInterfaceVersion = 1
 	};
 
-	// OBSE64 messages
+	// OBSE messages
 	enum {
 		kMessage_PostLoad,		// sent to registered plugins once all plugins have been loaded (no data)
 		kMessage_PostPostLoad,	// sent right after kMessage_PostPostLoad to facilitate the correct dispatching/registering of messages/listeners
@@ -113,7 +113,7 @@ struct OBSE64MessagingInterface
 	bool	(* Dispatch)(PluginHandle sender, std::uint32_t messageType, void * data, std::uint32_t dataLen, const char* receiver);
 };
 
-struct OBSE64MenuInterface
+struct OBSEMenuInterface
 {
 	enum
 	{
@@ -123,7 +123,7 @@ struct OBSE64MenuInterface
 	std::uint32_t	interfaceVersion;
 };
 
-struct OBSE64TaskInterface
+struct OBSETaskInterface
 {
 	enum
 	{
@@ -145,7 +145,7 @@ struct OBSE64TaskInterface
 	// void (*AddTaskPermanent)(ITaskDelegate* task);
 };
 
-struct OBSE64TrampolineInterface
+struct OBSETrampolineInterface
 {
 	enum
 	{
@@ -158,7 +158,7 @@ struct OBSE64TrampolineInterface
 	void * (* AllocateFromLocalPool)(PluginHandle plugin, size_t size);
 };
 
-typedef bool (* _OBSE64Plugin_Load)(const OBSE64Interface * obse64);
+typedef bool (* _OBSEPlugin_Load)(const OBSEInterface * obse);
 
 /**** plugin versioning ********************************************************
  *
@@ -170,9 +170,9 @@ typedef bool (* _OBSE64Plugin_Load)(const OBSE64Interface * obse64);
  *	
 
 extern "C" {
-__declspec(dllexport) OBSE64PluginVersionData OBSE64Plugin_Version =
+__declspec(dllexport) OBSEPluginVersionData OBSEPlugin_Version =
 {
-	OBSE64PluginVersionData::kVersion,
+	OBSEPluginVersionData::kVersion,
 	
 	1,
 	"my awesome plugin",
@@ -190,7 +190,7 @@ __declspec(dllexport) OBSE64PluginVersionData OBSE64Plugin_Version =
  *	
  ******************************************************************************/
 
-struct OBSE64PluginVersionData
+struct OBSEPluginVersionData
 {
 	enum
 	{
@@ -230,7 +230,7 @@ struct OBSE64PluginVersionData
 	std::uint32_t	structureIndependence;	// bitfield. describe how you handle structure layout using the kStructureIndependence_ enums
 	std::uint32_t	compatibleVersions[16];	// zero-terminated list of RUNTIME_VERSION_ defines your plugin is compatible with
 	
-	std::uint32_t	seVersionRequired;		// minimum version of the script extender required, compared against PACKED_OBSE64_VERSION
+	std::uint32_t	seVersionRequired;		// minimum version of the script extender required, compared against PACKED_OBSE_VERSION
 											// you probably should just set this to 0 unless you know what you are doing
 	std::uint32_t	reservedNonBreaking;	// bitfield. set to 0
 	std::uint32_t	reservedBreaking;		// bitfield. set to 0
@@ -239,9 +239,9 @@ struct OBSE64PluginVersionData
 /**** plugin API docs **********************************************************
  *	
  *	The base API is pretty simple. Add version data as shown in the
- *	OBSE64PluginVersionData docs above, and export this function:
+ *	OBSEPluginVersionData docs above, and export this function:
  *	
- *	bool OBSE64Plugin_Load(const OBSE64Interface * obse64)
+ *	bool OBSEPlugin_Load(const OBSEInterface * obse)
  *	
  *	In this function, use the interfaces above to register your commands, patch
  *	memory, generally do whatever you need to for integration with the runtime.
@@ -258,7 +258,7 @@ struct OBSE64PluginVersionData
  *	If your plugin needs to make modifications before global initializers, add
  *	and export this:
  *	
- *	bool OBSE64Plugin_Preload(const OBSE64Interface * obse64)
+ *	bool OBSEPlugin_Preload(const OBSEInterface * obse)
  *	
  *	Game and OBSE64 functionality may be limited during preload.
  *	

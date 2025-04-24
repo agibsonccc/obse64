@@ -28,10 +28,10 @@ OBSE64 will support the latest version of Oblivion Remastered available on Steam
 - No. Providing a link to https://www.nexusmods.com/oblivionremastered/mods/282 is the suggested method of distribution. Exceptions may be given under applicable circumstances; contact us at the email addresses below. This means that if you see this file available for download anywhere other than https://obse.silverlock.org, https://www.github.com/shad0wshayd3-TES4/obse64, or on Nexus by any user other than https://www.nexusmods.com/users/2166624, that service is violating copyright. I don't like having to explicitly spell this out, but my hand has been forced.
 
 * Where did the log files go?
-- <My Documents>\My Games\Oblivion Remastered\OBSE64\Logs\
+- <My Documents>\My Games\Oblivion Remastered\OBSE\Logs\
 
-* Where does the OBSE64.ini file go?
-- Data\OBSE64\OBSE64.ini. The .ini is generally not needed. See the whatsnew for .ini options.
+* Where does the obse.ini file go?
+- OBSE\obse.ini. The .ini is generally not needed. See the whatsnew for .ini options.
 
 * How do I uninstall OBSE64?
 - Delete the .dll and .exe files starting with obse64_ from your Oblivion Remastered folder.

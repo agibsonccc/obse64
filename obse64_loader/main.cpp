@@ -16,15 +16,15 @@
 
 int main(int argc, char ** argv)
 {
-	DebugLog::openRelative(CSIDL_MYDOCUMENTS, "\\My Games\\" SAVE_FOLDER_NAME "\\OBSE64\\Logs\\obse64_loader.txt");
+	DebugLog::openRelative(CSIDL_MYDOCUMENTS, "\\My Games\\" SAVE_FOLDER_NAME "\\OBSE\\Logs\\obse64_loader.txt");
 	//gLog.SetPrintLevel(IDebugLog::kLevel_FatalError);
 	//gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
 
 	SYSTEMTIME now;
 	GetSystemTime(&now);
 
-	_MESSAGE("OBSE64 loader: initialize (version = %d.%d.%d %08X %04d-%02d-%02d %02d:%02d:%02d, os = %s)",
-		OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA, LOADER_VERSION,
+	_MESSAGE("OBSE loader: initialize (version = %d.%d.%d %08X %04d-%02d-%02d %02d:%02d:%02d, os = %s)",
+		OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA, LOADER_VERSION,
 		now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond,
 		getOSInfoStr().c_str());
 
@@ -206,12 +206,12 @@ int main(int argc, char ** argv)
 		{
 			if(is64BitDLL(resourceHandle))
 			{
-				auto * version = (const OBSE64CoreVersionData *)getResourceLibraryProcAddress(resourceHandle, "OBSE64Core_Version");
+				auto * version = (const OBSECoreVersionData *)getResourceLibraryProcAddress(resourceHandle, "OBSECore_Version");
 				if(version)
 				{
 					dllVersion = version->runtimeVersion;
 
-					if(	(version->dataVersion == OBSE64CoreVersionData::kVersion) &&
+					if(	(version->dataVersion == OBSECoreVersionData::kVersion) &&
 						(version->runtimeVersion == procHookInfo.packedVersion))
 					{
 						dllOK = true;
@@ -262,7 +262,7 @@ int main(int argc, char ** argv)
 					"DLL version (%s) EXE version (%d.%d.%d)",
 					dllPath.c_str(),
 					productVersion.c_str(),
-					OBSE64_VERSION_INTEGER, OBSE64_VERSION_INTEGER_MINOR, OBSE64_VERSION_INTEGER_BETA);
+					OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA);
 			}
 			else
 			{

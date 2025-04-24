@@ -16,39 +16,39 @@ u32								s_trampolineLog = 1;
 BranchTrampolineManager g_branchTrampolineManager(g_branchTrampoline);
 BranchTrampolineManager g_localTrampolineManager(g_localTrampoline);
 
-static const OBSE64Interface g_OBSE64Interface =
+static const OBSEInterface g_OBSEInterface =
 {
-	PACKED_OBSE64_VERSION,
+	PACKED_OBSE_VERSION,
 	RUNTIME_VERSION,
-	OBSE64Interface::kInterfaceVersion,
+	OBSEInterface::kInterfaceVersion,
 
 	PluginManager::queryInterface,
 	PluginManager::getPluginHandle,
 	PluginManager::getPluginInfo
 };
 
-static const OBSE64TrampolineInterface g_OBSE64TrampolineInterface =
+static const OBSETrampolineInterface g_OBSETrampolineInterface =
 {
-	OBSE64TrampolineInterface::kInterfaceVersion,
-	AllocateFromOBSE64BranchPool,
-	AllocateFromOBSE64LocalPool
+	OBSETrampolineInterface::kInterfaceVersion,
+	AllocateFromOBSEBranchPool,
+	AllocateFromOBSELocalPool
 };
 
-static OBSE64MessagingInterface g_OBSE64MessagingInterface =
+static OBSEMessagingInterface g_OBSEMessagingInterface =
 {
-	OBSE64MessagingInterface::kInterfaceVersion,
+	OBSEMessagingInterface::kInterfaceVersion,
 	PluginManager::registerListener,
 	PluginManager::dispatchMessage,
 };
 
-static const OBSE64MenuInterface g_OBSE64MenuInterface =
+static const OBSEMenuInterface g_OBSEMenuInterface =
 {
-	OBSE64MenuInterface::kInterfaceVersion,
+	OBSEMenuInterface::kInterfaceVersion,
 };
 
-static const OBSE64TaskInterface g_OBSE64TaskInterface =
+static const OBSETaskInterface g_OBSETaskInterface =
 {
-	OBSE64TaskInterface::kInterfaceVersion,
+	OBSETaskInterface::kInterfaceVersion,
 	// TaskInterface::addTask,
 	// TaskInterface::addTaskPermanent
 };
@@ -126,12 +126,12 @@ void PluginManager::installPlugins(u32 phase)
 
 		if(plugin.handle)
 		{
-			plugin.load[phase] = (_OBSE64Plugin_Load)GetProcAddress(plugin.handle, (phase == kPhase_Preload) ? "OBSE64Plugin_Preload" : "OBSE64Plugin_Load");
+			plugin.load[phase] = (_OBSEPlugin_Load)GetProcAddress(plugin.handle, (phase == kPhase_Preload) ? "OBSEPlugin_Preload" : "OBSEPlugin_Load");
 			if(plugin.load)
 			{
 				const char * loadStatus = nullptr;
 
-				loadStatus = safeCallLoadPlugin(&plugin, &g_OBSE64Interface, phase);
+				loadStatus = safeCallLoadPlugin(&plugin, &g_OBSEInterface, phase);
 
 				if(!loadStatus)
 				{
@@ -192,9 +192,9 @@ void PluginManager::loadComplete()
 	}
 
 	// alert any listeners that plugin load has finished
-	dispatchMessage(0, OBSE64MessagingInterface::kMessage_PostLoad, nullptr, 0, nullptr);
+	dispatchMessage(0, OBSEMessagingInterface::kMessage_PostLoad, nullptr, 0, nullptr);
 	// second post-load dispatch
-	dispatchMessage(0, OBSE64MessagingInterface::kMessage_PostPostLoad, nullptr, 0, nullptr);
+	dispatchMessage(0, OBSEMessagingInterface::kMessage_PostPostLoad, nullptr, 0, nullptr);
 }
 
 void PluginManager::deinit()
@@ -240,14 +240,14 @@ const char * PluginManager::pluginNameFromHandle(PluginHandle handle) const
 	if(handle > 0 && handle <= m_plugins.size())
 		return (m_plugins[handle - 1].version.name);
 	else if(handle == 0)
-		return "OBSE64";
+		return "OBSE";
 
 	return nullptr;
 }
 
 PluginHandle PluginManager::lookupHandleFromName(const char * pluginName) const
 {
-	if(!_stricmp("OBSE64", pluginName))
+	if(!_stricmp("OBSE", pluginName))
 		return 0;
 
 	u32	idx = 1;
@@ -270,16 +270,16 @@ void * PluginManager::queryInterface(u32 id)
 	switch(id)
 	{
 	case kInterface_Messaging:
-		result = (void *)&g_OBSE64MessagingInterface;
+		result = (void *)&g_OBSEMessagingInterface;
 		break;
 	case kInterface_Trampoline:
-		result = (void *)&g_OBSE64TrampolineInterface;
+		result = (void *)&g_OBSETrampolineInterface;
 		break;
 	case kInterface_Menu:
-		result = (void*)&g_OBSE64MenuInterface;
+		result = (void*)&g_OBSEMenuInterface;
 		break;
 	case kInterface_Task:
-		result = (void*)&g_OBSE64TaskInterface;
+		result = (void*)&g_OBSETaskInterface;
 		break;
 
 	default:
@@ -292,7 +292,7 @@ void * PluginManager::queryInterface(u32 id)
 
 PluginHandle PluginManager::getPluginHandle(void)
 {
-	ASSERT_STR(s_currentPluginHandle, "A plugin has called OBSE64Interface::GetPluginHandle outside of its Query/Load handlers");
+	ASSERT_STR(s_currentPluginHandle, "A plugin has called OBSEInterface::GetPluginHandle outside of its Query/Load handlers");
 
 	return s_currentPluginHandle;
 }
@@ -306,12 +306,12 @@ bool PluginManager::findPluginDirectory(void)
 {
 	bool	result = false;
 
-	// find the path <runtime directory>/obse64/
+	// find the path <runtime directory>/obse/
 	std::string	runtimeDirectory = getRuntimeDirectory();
 
 	if(!runtimeDirectory.empty())
 	{
-		m_pluginDirectory = runtimeDirectory + "OBSE64\\Plugins\\";
+		m_pluginDirectory = runtimeDirectory + "OBSE\\Plugins\\";
 		result = true;
 	}
 
@@ -338,7 +338,7 @@ void PluginManager::scanPlugins(void)
 		{
 			if(is64BitDLL(resourceHandle))
 			{
-				auto * version = (const OBSE64PluginVersionData *)getResourceLibraryProcAddress(resourceHandle, "OBSE64Plugin_Version");
+				auto * version = (const OBSEPluginVersionData *)getResourceLibraryProcAddress(resourceHandle, "OBSEPlugin_Version");
 				if(version)
 				{
 					plugin.version = *version;
@@ -352,8 +352,8 @@ void PluginManager::scanPlugins(void)
 						plugin.internalHandle = handleIdx;
 						handleIdx++;
 
-						plugin.hasLoad = getResourceLibraryProcAddress(resourceHandle, "OBSE64Plugin_Load") != nullptr;
-						plugin.hasPreload = getResourceLibraryProcAddress(resourceHandle, "OBSE64Plugin_Preload") != nullptr;
+						plugin.hasLoad = getResourceLibraryProcAddress(resourceHandle, "OBSEPlugin_Load") != nullptr;
+						plugin.hasPreload = getResourceLibraryProcAddress(resourceHandle, "OBSEPlugin_Preload") != nullptr;
 
 						m_plugins.push_back(plugin);
 					}
@@ -394,7 +394,7 @@ const char * PluginManager::checkAddressLibrary(void)
 	const char * buildType = "";
 
 	char fileName[256];
-	_snprintf_s(fileName, 256, "OBSE64\\Plugins\\versionlib-%d-%d-%d-%d%s.bin",
+	_snprintf_s(fileName, 256, "OBSE\\Plugins\\versionlib-%d-%d-%d-%d%s.bin",
 		GET_EXE_VERSION_MAJOR(RUNTIME_VERSION),
 		GET_EXE_VERSION_MINOR(RUNTIME_VERSION),
 		GET_EXE_VERSION_BUILD(RUNTIME_VERSION),
@@ -412,7 +412,7 @@ const char * PluginManager::checkAddressLibrary(void)
 	return s_status;
 }
 
-const char * PluginManager::safeCallLoadPlugin(LoadedPlugin * plugin, const OBSE64Interface * obse64, u32 phase)
+const char * PluginManager::safeCallLoadPlugin(LoadedPlugin * plugin, const OBSEInterface * obse64, u32 phase)
 {
 	__try
 	{
@@ -430,7 +430,7 @@ const char * PluginManager::safeCallLoadPlugin(LoadedPlugin * plugin, const OBSE
 	return nullptr;
 }
 
-void PluginManager::sanitize(OBSE64PluginVersionData * version)
+void PluginManager::sanitize(OBSEPluginVersionData * version)
 {
 	version->name[sizeof(version->name) - 1] = 0;
 	version->author[sizeof(version->author) - 1] = 0;
@@ -456,7 +456,7 @@ static const PluginCompatEntry	kPluginCompatList[] =
 	{	nullptr, 0, nullptr }
 };
 
-const char * PluginManager::checkPluginCompatibility(const OBSE64PluginVersionData & version)
+const char * PluginManager::checkPluginCompatibility(const OBSEPluginVersionData & version)
 {
 	__try
 	{
@@ -503,11 +503,11 @@ const char * PluginManager::checkPluginCompatibility(const OBSE64PluginVersionDa
 
 		// version compatibility means both address independence and structure independence
 		bool hasAddressIndependence = version.addressIndependence &
-			(OBSE64PluginVersionData::kAddressIndependence_Signatures |
-			OBSE64PluginVersionData::kAddressIndependence_AddressLibrary);
+			(OBSEPluginVersionData::kAddressIndependence_Signatures |
+			OBSEPluginVersionData::kAddressIndependence_AddressLibrary);
 		bool hasStructureIndependence = version.structureIndependence &
-			(OBSE64PluginVersionData::kStructureIndependence_NoStructs |
-			OBSE64PluginVersionData::kStructureIndependence_InitialLayout);
+			(OBSEPluginVersionData::kStructureIndependence_NoStructs |
+			OBSEPluginVersionData::kStructureIndependence_InitialLayout);
 
 		bool versionIndependent = hasAddressIndependence && hasStructureIndependence;
 
@@ -520,7 +520,7 @@ const char * PluginManager::checkPluginCompatibility(const OBSE64PluginVersionDa
 			versionIndependent = false;
 
 		// verify that address library is there to centralize error message
-		if(version.addressIndependence & OBSE64PluginVersionData::kAddressIndependence_AddressLibrary)
+		if(version.addressIndependence & OBSEPluginVersionData::kAddressIndependence_AddressLibrary)
 		{
 			const char * result = checkAddressLibrary();
 			if(result) return result;
@@ -553,7 +553,7 @@ const char * PluginManager::checkPluginCompatibility(const OBSE64PluginVersionDa
 		}
 
 		// SE version compatibility
-		if(version.seVersionRequired > PACKED_OBSE64_VERSION)
+		if(version.seVersionRequired > PACKED_OBSE_VERSION)
 		{
 			return "disabled, requires newer script extender";
 		}
@@ -665,9 +665,9 @@ void PluginManager::reportPluginErrors()
 	message += "\nExit game? (yes highly suggested)";
 
 	int result = MessageBox(0, message.c_str(),
-		"OBSE64 Plugin Loader (" __PREPRO_TOKEN_STR__(OBSE64_VERSION_INTEGER) "."
-		__PREPRO_TOKEN_STR__(OBSE64_VERSION_INTEGER_MINOR) "."
-		__PREPRO_TOKEN_STR__(OBSE64_VERSION_INTEGER_BETA) ")",
+		"OBSE Plugin Loader (" __PREPRO_TOKEN_STR__(OBSE_VERSION_INTEGER) "."
+		__PREPRO_TOKEN_STR__(OBSE_VERSION_INTEGER_MINOR) "."
+		__PREPRO_TOKEN_STR__(OBSE_VERSION_INTEGER_BETA) ")",
 		MB_YESNO);
 
 	if(result == IDYES)
@@ -693,13 +693,13 @@ void PluginManager::updateAddressLibraryPrompt()
 // Plugin communication interface
 struct PluginListener {
 	PluginHandle	listener;
-	OBSE64MessagingInterface::EventCallback	handleMessage;
+	OBSEMessagingInterface::EventCallback	handleMessage;
 };
 
 typedef std::vector<std::vector<PluginListener> > PluginListeners;
 static PluginListeners s_pluginListeners;
 
-bool PluginManager::registerListener(PluginHandle listener, const char* sender, OBSE64MessagingInterface::EventCallback handler)
+bool PluginManager::registerListener(PluginHandle listener, const char* sender, OBSEMessagingInterface::EventCallback handler)
 {
 	// because this can be called while plugins are loading, gotta make sure number of plugins hasn't increased
 	u32 numPlugins = g_pluginManager.numPlugins() + 1;
@@ -805,7 +805,7 @@ bool PluginManager::dispatchMessage(PluginHandle sender, u32 messageType, void *
 		return false;
 	for (std::vector<PluginListener>::iterator iter = s_pluginListeners[sender].begin(); iter != s_pluginListeners[sender].end(); ++iter)
 	{
-		OBSE64MessagingInterface::Message msg;
+		OBSEMessagingInterface::Message msg;
 		msg.data = data;
 		msg.type = messageType;
 		msg.sender = senderName;
@@ -852,7 +852,7 @@ inline void * BranchTrampolineManager::allocate(PluginHandle plugin, size_t size
 }
 
 
-void * AllocateFromOBSE64BranchPool(PluginHandle plugin, size_t size)
+void * AllocateFromOBSEBranchPool(PluginHandle plugin, size_t size)
 {
 	if (s_trampolineLog) {
 		_DMESSAGE("plugin %d allocated %lld bytes from branch pool", plugin, size);
@@ -860,7 +860,7 @@ void * AllocateFromOBSE64BranchPool(PluginHandle plugin, size_t size)
 	return g_branchTrampolineManager.allocate(plugin, size);
 }
 
-void * AllocateFromOBSE64LocalPool(PluginHandle plugin, size_t size)
+void * AllocateFromOBSELocalPool(PluginHandle plugin, size_t size)
 {
 	if (s_trampolineLog) {
 		_DMESSAGE("plugin %d allocated %lld bytes from local pool", plugin, size);
