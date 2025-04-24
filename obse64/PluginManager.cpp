@@ -41,18 +41,6 @@ static OBSEMessagingInterface g_OBSEMessagingInterface =
 	PluginManager::dispatchMessage,
 };
 
-static const OBSEMenuInterface g_OBSEMenuInterface =
-{
-	OBSEMenuInterface::kInterfaceVersion,
-};
-
-static const OBSETaskInterface g_OBSETaskInterface =
-{
-	OBSETaskInterface::kInterfaceVersion,
-	// TaskInterface::addTask,
-	// TaskInterface::addTaskPermanent
-};
-
 PluginManager::PluginManager()
 {
 	//
@@ -274,12 +262,6 @@ void * PluginManager::queryInterface(u32 id)
 		break;
 	case kInterface_Trampoline:
 		result = (void *)&g_OBSETrampolineInterface;
-		break;
-	case kInterface_Menu:
-		result = (void*)&g_OBSEMenuInterface;
-		break;
-	case kInterface_Task:
-		result = (void*)&g_OBSETaskInterface;
 		break;
 
 	default:

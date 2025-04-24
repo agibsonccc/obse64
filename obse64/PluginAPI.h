@@ -28,8 +28,6 @@ enum
 	kInterface_Invalid = 0,
 	kInterface_Messaging,
 	kInterface_Trampoline,
-	kInterface_Menu,
-	kInterface_Task,
 	kInterface_Max,
 };
 
@@ -100,49 +98,11 @@ struct OBSEMessagingInterface
 	enum {
 		kMessage_PostLoad,		// sent to registered plugins once all plugins have been loaded (no data)
 		kMessage_PostPostLoad,	// sent right after kMessage_PostPostLoad to facilitate the correct dispatching/registering of messages/listeners
-	//	kMessage_PostDataLoad,	// sent right after all game data has loaded (Passes TESDataHandler as pointer)
-	//	kMessage_PostPostDataLoad, // sent after all game data has loaded, and all PostDataLoad events have handled (Passes TESDataHandler as pointer)
-	//	kMessage_PreSaveGame,
-	//	kMessage_PostSaveGame,
-	//	kMessage_PreLoadGame,
-	//	kMessage_PostLoadGame,
 	};
 
 	std::uint32_t interfaceVersion;
 	bool	(* RegisterListener)(PluginHandle listener, const char* sender, EventCallback handler);
 	bool	(* Dispatch)(PluginHandle sender, std::uint32_t messageType, void * data, std::uint32_t dataLen, const char* receiver);
-};
-
-struct OBSEMenuInterface
-{
-	enum
-	{
-		kInterfaceVersion = 1
-	};
-
-	std::uint32_t	interfaceVersion;
-};
-
-struct OBSETaskInterface
-{
-	enum
-	{
-		kInterfaceVersion = 1
-	};
-	std::uint32_t interfaceVersion;
-
-	class ITaskDelegate
-	{
-	public:
-		virtual void Run() = 0;
-		virtual void Destroy() = 0; // delete this or free/release here
-	};
-
-	// This task will be executed once on the Main thread, then deleted
-	// void (*AddTask)(ITaskDelegate* task);
-
-	// This task will be executed every frame on the Main thread without deleting
-	// void (*AddTaskPermanent)(ITaskDelegate* task);
 };
 
 struct OBSETrampolineInterface
