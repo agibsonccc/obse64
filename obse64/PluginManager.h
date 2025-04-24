@@ -38,7 +38,9 @@ public:
 	// interface handlers
 	static void *				queryInterface(u32 id);
 	static PluginHandle			getPluginHandle();
+	static u32					getReleaseIndex();
 	static const PluginInfo *	getPluginInfo(const char* name);
+	static const char*			getSaveFolderName();
 
 	static bool dispatchMessage(PluginHandle sender, u32 messageType, void * data, u32 dataLen, const char* receiver);
 	static bool	registerListener(PluginHandle listener, const char* sender, OBSEMessagingInterface::EventCallback handler);

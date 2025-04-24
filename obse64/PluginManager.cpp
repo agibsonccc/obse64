@@ -20,11 +20,15 @@ static const OBSEInterface g_OBSEInterface =
 {
 	PACKED_OBSE_VERSION,
 	RUNTIME_VERSION,
+	0,
+	0,
 	OBSEInterface::kInterfaceVersion,
 
 	PluginManager::queryInterface,
+	PluginManager::getReleaseIndex,
 	PluginManager::getPluginHandle,
-	PluginManager::getPluginInfo
+	PluginManager::getPluginInfo,
+	PluginManager::getSaveFolderName
 };
 
 static const OBSETrampolineInterface g_OBSETrampolineInterface =
@@ -272,6 +276,11 @@ void * PluginManager::queryInterface(u32 id)
 	return result;
 }
 
+u32 PluginManager::getReleaseIndex(void)
+{
+	return OBSE_VERSION_RELEASEIDX;
+}
+
 PluginHandle PluginManager::getPluginHandle(void)
 {
 	ASSERT_STR(s_currentPluginHandle, "A plugin has called OBSEInterface::GetPluginHandle outside of its Query/Load handlers");
@@ -279,9 +288,14 @@ PluginHandle PluginManager::getPluginHandle(void)
 	return s_currentPluginHandle;
 }
 
-const PluginInfo*	PluginManager::getPluginInfo(const char* name)
+const PluginInfo* PluginManager::getPluginInfo(const char* name)
 {
 	return g_pluginManager.infoByName(name);
+}
+
+const char* PluginManager::getSaveFolderName(void)
+{
+	return SAVE_FOLDER_NAME;
 }
 
 bool PluginManager::findPluginDirectory(void)

@@ -40,6 +40,8 @@ struct OBSEInterface
 
 	std::uint32_t	obse64Version;
 	std::uint32_t	runtimeVersion;
+	std::uint32_t	editorVersion;
+	std::uint32_t	isEditor;
 	std::uint32_t	interfaceVersion;
 	void *	(* QueryInterface)(std::uint32_t id);
 
@@ -47,8 +49,14 @@ struct OBSEInterface
 	// invalid if called at any other time, so call it once and save the result
 	PluginHandle		(* GetPluginHandle)(void);
 
+	// returns the OBSE64 build's release index
+	std::uint32_t		(* GetReleaseIndex)(void);
+
 	// returns the plugin info structure for a plugin by name, only valid to be called after PostLoad message
 	const PluginInfo*	(* GetPluginInfo)(const char * name);
+
+	// returns the folder name the game is using in the My Games folder
+	const char*			(* GetSaveFolderName)(void);
 };
 
 /**** Messaging API docs ********************************************************************
@@ -143,7 +151,7 @@ __declspec(dllexport) OBSEPluginVersionData OBSEPlugin_Version =
 	{ RUNTIME_VERSION_0_411_140, 0 },	// compatible with 0.411.140 and that's it
 
 	0,	// works with any version of the script extender. you probably do not need to put anything here
-	0, 0,	// set these reserved fields to 0
+	0, 0, 0	// set these reserved fields to 0
 };
 };
 
@@ -194,6 +202,7 @@ struct OBSEPluginVersionData
 											// you probably should just set this to 0 unless you know what you are doing
 	std::uint32_t	reservedNonBreaking;	// bitfield. set to 0
 	std::uint32_t	reservedBreaking;		// bitfield. set to 0
+	std::uint8_t	reserved[512];			// set to 0
 };
 
 /**** plugin API docs **********************************************************
