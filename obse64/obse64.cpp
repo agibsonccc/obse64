@@ -10,6 +10,7 @@
 #include "PluginManager.h"
 
 #include "Hooks_Script.h"
+#include "Hooks_Version.h"
 
 HINSTANCE g_moduleHandle = nullptr;
 
@@ -140,6 +141,7 @@ void OBSE64_Initialize()
 	g_pluginManager.loadComplete();
 
 	Hooks_Script_Apply();
+	Hooks_Version_Apply();
 
 	FlushInstructionCache(GetCurrentProcess(), NULL, 0);
 

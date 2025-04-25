@@ -61,6 +61,8 @@ source_group(
 	FILES
 		Hooks_Script.cpp
 		Hooks_Script.h
+		Hooks_Version.cpp
+		Hooks_Version.h
 )
 
 source_group(
