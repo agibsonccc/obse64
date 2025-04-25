@@ -25,8 +25,8 @@ static const OBSEInterface g_OBSEInterface =
 	OBSEInterface::kInterfaceVersion,
 
 	PluginManager::queryInterface,
-	PluginManager::getReleaseIndex,
 	PluginManager::getPluginHandle,
+	PluginManager::getReleaseIndex,
 	PluginManager::getPluginInfo,
 	PluginManager::getSaveFolderName
 };
