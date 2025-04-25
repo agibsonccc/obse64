@@ -1,7 +1,7 @@
 Oblivion Remastered Script Extender v0.1.0 pre-alpha
 by Ian Patterson
 
-The Oblivion Remastered Script Extender, or OBSE64 for short, is a modder's resource that expands the scripting capabilities of Oblivion Remastered. As the editor is not out, it's mostly a plugin loader for now. Depending on where modders show interest, this will expand to Scaleform and Papyrus (or other things) over time.
+The Oblivion Remastered Script Extender, or OBSE64 for short, is a modder's resource that expands the modding capabilities of Oblivion Remastered. It's a plugin loader for now because people are making plugins with no version compatibility detection and that's dangerous/confusing for users. Fixing some of the areas where mods would conflict with each other is planned. We'll see where modding for this game goes - many things can be done from the embedded engine side, and other things can be done from the Unreal side, but communication back and forth is a problem. As modding will probably be very different, this is not intended to be a direct port of classic OBSE's functionality.
 
 [ Compatibility ]
 
