@@ -112,7 +112,7 @@ int main(int argc, char ** argv)
 			if(err == ERROR_ACCESS_DENIED)
 			{
 				// this might be ms store
-				std::string manifestPath = runtimeDir + "appxmanifest.xml";
+				std::string manifestPath = runtimeDir + "../../../appxmanifest.xml";	// assuming this is there
 
 				if(fileCheck.open(manifestPath.c_str()))
 				{
@@ -230,8 +230,6 @@ int main(int argc, char ** argv)
 
 		if(!dllOK)
 		{
-			bool preSigning = false;
-
 			VS_FIXEDFILEINFO info;
 			std::string productName;
 			std::string productVersion;
@@ -242,35 +240,16 @@ int main(int argc, char ** argv)
 				DumpVersionInfo(info);
 				_MESSAGE("productName = %s", productName.c_str());
 				_MESSAGE("productVersion = %s", productVersion.c_str());
-
-				u64 fullVersion = (u64(info.dwFileVersionMS) << 32) | info.dwFileVersionLS;
-				u64 kFirstSignedVersion = 0x000000000002000E;
-
-				if(fullVersion < kFirstSignedVersion)
-					preSigning = true;
 			}
 			else
 			{
 				_MESSAGE("couldn't get file version info");
 			}
 
-			if(preSigning)
-			{
-				PrintLoaderError(
-					"Old OBSE64 DLL (%s).\n"
-					"Please make sure that you have replaced all files with their new versions.\n"
-					"DLL version (%s) EXE version (%d.%d.%d)",
-					dllPath.c_str(),
-					productVersion.c_str(),
-					OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA);
-			}
-			else
-			{
-				PrintLoaderError(
-					"Bad OBSE64 DLL (%s).\n"
-					"Do not rename files; it will not magically make anything work.\n"
-					"%08X %08X", dllPath.c_str(), procHookInfo.packedVersion, dllVersion);
-			}
+			PrintLoaderError(
+				"Bad OBSE64 DLL (%s).\n"
+				"Do not rename files; it will not magically make anything work.\n"
+				"%08X %08X", dllPath.c_str(), procHookInfo.packedVersion, dllVersion);
 
 			return 1;
 		}

@@ -200,7 +200,7 @@ static bool IsUPXImage(const u8 * base)
 
 static bool IsWinStoreImage(const u8 * base)
 {
-	return HasImportedLibrary(base, "XCurl.dll");	// or api-ms-win-core-psm-appnotify-l1-1-0.dll
+	return HasImportedLibrary(base, "api-ms-win-core-psm-appnotify-l1-1-0.dll");	// not tested, haven't seen the msstore exe yet
 }
 
 static bool IsGOGImage(const u8 * base)
