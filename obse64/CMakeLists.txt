@@ -48,12 +48,36 @@ source_group(
 )
 
 source_group(
-	${PROJECT_NAME}/api
+	${PROJECT_NAME}/game
 	FILES
 		GameConsole.cpp
 		GameConsole.h
 		GameScript.cpp
 		GameScript.h
+		GameData.cpp
+		GameData.h
+		GameTypes.cpp
+		GameTypes.h
+)
+
+source_group(
+	${PROJECT_NAME}/altar
+	FILES
+		AltarSync.cpp
+		AltarSync.h
+)
+
+source_group(
+	${PROJECT_NAME}/ue
+	FILES
+		UnrealObject.h
+		UnrealTypes.h
+)
+
+source_group(
+	${PROJECT_NAME}/ni
+	FILES
+		NiTypes.h
 )
 
 source_group(
