@@ -71,6 +71,7 @@ source_group(
 	${PROJECT_NAME}/ue
 	FILES
 		UnrealObject.h
+		UnrealTypes.cpp
 		UnrealTypes.h
 )
 
