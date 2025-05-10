@@ -58,6 +58,8 @@ source_group(
 		GameData.h
 		GameTypes.cpp
 		GameTypes.h
+		GameRTTI.h
+		GameRTTI.inl
 )
 
 source_group(
@@ -70,6 +72,8 @@ source_group(
 source_group(
 	${PROJECT_NAME}/ue
 	FILES
+		UnrealAPI.cpp
+		UnrealAPI.h
 		UnrealObject.h
 		UnrealTypes.cpp
 		UnrealTypes.h
@@ -96,6 +100,8 @@ source_group(
 		PluginAPI.h
 		PluginManager.cpp
 		PluginManager.h
+		SteamInit.cpp
+		SteamInit.h
 )
 
 # ---- Create library ----
@@ -107,6 +113,7 @@ add_library(
 	${sources}
 	obse64.def
 	obse64_version.rc
+	GameRTTI.inl
 )
 
 add_library(obse64::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
