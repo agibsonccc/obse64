@@ -8,6 +8,7 @@
 #include "obse64_common/BranchTrampoline.h"
 #include "obse64_common/CoreInfo.h"
 #include "PluginManager.h"
+#include "SteamInit.h"
 
 #include "Hooks_Script.h"
 #include "Hooks_Version.h"
@@ -135,6 +136,8 @@ void OBSE64_Initialize()
 	static bool runOnce = false;
 	if(runOnce) return;
 	runOnce = true;
+
+	SteamInit(2623190);	// fixed appid?
 
 	// load plugins
 	g_pluginManager.installPlugins(PluginManager::kPhase_Load);
