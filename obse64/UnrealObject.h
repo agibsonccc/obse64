@@ -6,6 +6,7 @@
 // object and RTTI system
 
 class UClass;
+class UPackage;
 
 // 28
 class UObject
@@ -130,3 +131,33 @@ class UClass : public UStruct
 public:
 	virtual ~UClass();
 };
+
+// 260
+class FUObjectHashTable
+{
+public:
+	u8	m_lock[0x28];	// 00 CRITICAL_SECTION (entire thing?)
+
+	// 10
+	struct ObjList
+	{
+		// todo
+
+		u64	unk0;
+		u64	unk8;
+	};
+
+	TMap <u32, ObjList>				unk028;				// 028
+	TMap <u32, u32>					unk078;				// 078
+	TMap <UObject *, ObjList>		m_outers;			// 0C8
+	TMap <UClass *, ObjList>		m_objectsOfType;	// 118
+	TMap <UClass *, void *>			m_typeHierarchy;	// 168
+	u64								unk1B8;				// 1B8
+	TMap <UPackage *, ObjList>		unk1C0;				// 1C0
+	TMap <UObject *, UPackage *>	m_objToPackage;		// 210
+
+	void Lock();
+	void Unlock();
+};
+
+extern RelocPtr <FUObjectHashTable> g_uObjectHashTable;
