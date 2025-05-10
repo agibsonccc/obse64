@@ -7,6 +7,7 @@
 
 class UClass;
 class UPackage;
+class UFunction;
 
 // 28
 class UObject
@@ -125,12 +126,44 @@ public:
 
 static_assert(sizeof(UStruct) == 0xB0);
 
-// 
+// 200
 class UClass : public UStruct
 {
 public:
 	virtual ~UClass();
+
+	struct NativeFunction
+	{
+		FName	name;
+		void	* fn;
+	};
+
+	void	* m_constructor;	// 0B0
+	void	* m_constructor2;	// 0B8
+	void	* m_refCollector;	// 0C0
+	u32		unk0C8;				// 0C8
+	u32		unk0CC;				// 0CC
+	u16		unk0D0;				// 0D0
+	u16		pad0D2;				// 0D2
+	u32		unk0D4;				// 0D4
+	u64		unk0D8;				// 0D8
+	UClass	* unk0E0;			// 0E0
+	FName	unk0E8;				// 0E8 - "Engine" or "Game"
+	TArray <void *>	unk0F0;		// 0F0
+	TArray <void *>	unk100;		// 100
+	UObject	* m_cdo;			// 110
+	void	* unk118;			// 118
+	void	* unk120;			// 120
+	TMap <FName, UFunction *>	m_functions;	// 128
+	void	* m_fnLock;			// 178 SRWLOCK
+	TMap <FName, UFunction *>	m_functions2;	// 180
+	void	* m_fnLock2;		// 188 SRWLOCK
+	TArray <void *>	unk1D8;		// 1D8
+	u64		unk1E8;				// 1E8
+	TArray <NativeFunction>		m_nativeFunctions;	// 1F0
 };
+
+static_assert(sizeof(UClass) == 0x200);
 
 // 260
 class FUObjectHashTable
@@ -159,5 +192,7 @@ public:
 	void Lock();
 	void Unlock();
 };
+
+static_assert(sizeof(FUObjectHashTable) == 0x260);
 
 extern RelocPtr <FUObjectHashTable> g_uObjectHashTable;
