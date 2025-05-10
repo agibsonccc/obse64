@@ -74,6 +74,7 @@ source_group(
 	FILES
 		UnrealAPI.cpp
 		UnrealAPI.h
+		UnrealObject.cpp
 		UnrealObject.h
 		UnrealTypes.cpp
 		UnrealTypes.h

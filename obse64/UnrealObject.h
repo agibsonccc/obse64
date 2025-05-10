@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UnrealTypes.h"
+#include "obse64_common/Relocation.h"
 
 // object and RTTI system
 
@@ -21,6 +22,64 @@ public:
 };
 
 static_assert(sizeof(UObject) == 0x28);
+
+// 18
+class FUObjectItem
+{
+public:
+	UObject	* m_obj;	// 00
+	u32		m_flags;	// 08
+	u32		m_cluster;	// 0C
+	u32		m_serial;	// 10
+	u32		pad14;		// 14
+};
+
+static_assert(sizeof(FUObjectItem) == 0x18);
+
+// 20
+class FChunkedFixedUObjectArray
+{
+public:
+	enum
+	{
+		kChunkSize = 0x10000,
+	};
+
+	FUObjectItem	** m_chunks;	// 00
+	void			* unk08;		// 08
+	u32				m_objSize;		// 10 objects allocated
+	u32				m_objLen;		// 14 objects used
+	u32				m_chunkSize;	// 18 chunks allocated
+	u32				m_chunkLen;		// 1C chunks used
+};
+
+static_assert(sizeof(FChunkedFixedUObjectArray) == 0x20);
+
+// B8
+class FUObjectArray
+{
+public:
+	u32		unk00;					// 00
+	u32		unk04;					// 04 init'd to FFFFFFFF
+	u32		unk08;					// 08
+	u8		unk0C;					// 0C
+	u8		pad0D[3];				// 0D
+
+	FChunkedFixedUObjectArray	m_objects;	// 10
+
+	u8				m_lock[0x28];	// 30 CRITICAL_SECTION
+	TArray <u32>	unk58;			// 58
+	TArray <void *>	unk68;			// 68
+	TArray <void *>	unk78;			// 78
+	u8				m_lock2[0x28];	// 88 CRITICAL_SECTION
+	u32				m_serial;		// B0
+	u8				unkB4;			// B4
+	u8				padB5[3];		// B5
+};
+
+static_assert(sizeof(FUObjectArray) == 0xB8);
+
+extern RelocPtr <FUObjectArray> g_uObjectArray;
 
 // 30
 class UField : public UObject
