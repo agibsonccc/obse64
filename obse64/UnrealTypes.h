@@ -41,11 +41,14 @@ static_assert(sizeof(FString) == 0x10);
 // size represents max allocation, actual instances are as short as possible
 class FNameEntry
 {
+public:
 	enum
 	{
-		kWide =			0x8000,	// selects between char and wchar_t
-		kUnkMask =		0x7C00,	// ?
-		kLengthMask =	0x03FF,	// length in character units
+		kWide =				0x0001,	// selects between char and wchar_t
+		kUnkMask =			0x003E,	// ?
+		kUnkMaskShift =		1,		// ?
+		kLengthMask =		0xFFC0,	// length in character units
+		kLengthMaskShift =	6,		// 
 
 		kMaxLen = 1024,
 	};
@@ -59,6 +62,8 @@ class FNameEntry
 	};
 
 	bool Wide() const { return header & kWide; }
+	u8 GetUnk() const { return (header & kUnkMask) >> kUnkMaskShift; }
+	u16 Length() const { return (header & kLengthMask) >> kLengthMaskShift; }
 };
 
 static_assert(sizeof(FNameEntry) == 2 + (1024 * 2));
@@ -68,6 +73,7 @@ class FNameStorage
 {
 public:
 	FNameEntry * Get(u32 idx);
+	FNameEntry * Get(const FName & fname);
 
 	void		* m_lock;			// 00 - SRWLOCK
 	u32			m_curChunk;			// 08
@@ -77,7 +83,7 @@ public:
 	// more stuff I don't care about right now
 };
 
-extern RelocAddr <FNameStorage> g_fnameStorage;
+extern RelocPtr <FNameStorage> g_fnameStorage;
 
 // 20
 class TBitArray

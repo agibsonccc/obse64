@@ -67,7 +67,7 @@ public:
 
 	FChunkedFixedUObjectArray	m_objects;	// 10
 
-	u8				m_lock[0x28];	// 30 CRITICAL_SECTION
+	u8				m_lock[0x28];	// 30 CRITICAL_SECTION around m_objects
 	TArray <u32>	unk58;			// 58
 	TArray <void *>	unk68;			// 68
 	TArray <void *>	unk78;			// 78
@@ -75,6 +75,9 @@ public:
 	u32				m_serial;		// B0
 	u8				unkB4;			// B4
 	u8				padB5[3];		// B5
+
+	void Lock();
+	void Unlock();
 };
 
 static_assert(sizeof(FUObjectArray) == 0xB8);
