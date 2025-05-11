@@ -60,6 +60,7 @@ source_group(
 		GameTypes.h
 		GameRTTI.h
 		GameRTTI.inl
+		GameBSExtraData.h
 )
 
 source_group(
