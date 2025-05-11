@@ -111,7 +111,8 @@ void OBSE64_Preinit()
 	// WaitForDebugger();
 #endif
 
-	if(!g_branchTrampoline.create(1024 * 64))
+	// command table needs to fit in branch trampoline, allocation is larger
+	if(!g_branchTrampoline.create(1024 * 512))
 	{
 		_ERROR("couldn't create branch trampoline. this is fatal. skipping remainder of init process.");
 		return;
