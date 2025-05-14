@@ -234,7 +234,7 @@ HookedCommandTable::PatchInfo kCmdTableLenPatches[] =
 
 	{ 0x06A70820 + 0x0003 + 2,	0, kPatchType_Data32 },
 
-//	{ 0x06A70870 + 0x0000 + 2,	0, kPatchType_Data32 },
+//	{ 0x06A70870 + 0x0000 + 2,	0, kPatchType_Data32 },	// replaced with hooked function
 
 	{ 0, 0, kPatchType_End }
 };
