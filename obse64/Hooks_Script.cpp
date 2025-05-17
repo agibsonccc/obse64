@@ -72,7 +72,7 @@ struct ParamTypeInfo
 {
 	u32		typeID;		// 0
 	bool	variable;	// 4
-	bool	refType;	// 5
+	bool	isForm;		// 5
 	u8		pad6[2];	// 6
 };
 
@@ -150,6 +150,68 @@ void HookedCommandTable::Extend(u32 opcode)
 	}
 }
 
+/*** references to command table
+ *	
+ *	696E720	0D1D	base
+ *	large function, patch
+ *	
+ *	6972140	04AF	num commands
+ *			04C2	base
+ *	large function, patch
+ *	
+ *	698F100	006C	base
+ *	simple patch
+ *	
+ *	6A35210	009B	base
+ *			00A2	num commands
+ *	simple patch
+ *	
+ *	696FC80	0066	short name
+ *			006D	end command short name
+ *			0122	opcode (load imagebase)
+ *			0129	opcode
+ *	simple patch
+ *	
+ *	6A70820	0003	num commands
+ *			000D	base
+ *	tiny function, replace
+ *
+ *	696FE00	0028	num commands
+ *			0033	base
+ *	replace function, it's small
+ *
+ *	6A70800	0000	num commands
+ *			0011	num params
+ *	tiny function, replace
+ *	
+ *	6A70870	0000	num commands
+ *			0018	num params
+ *			0025	params
+ *	tiny function, replace
+ *	
+ *	698EDB0	0059	condition
+ *			018B	base
+ *	large function, patch
+ *	reuse of load address register makes this complex
+ *
+ *	6A708C0	0026	num params
+ *			0037	params
+ *	large function, patch
+ *	reuse of load address register makes this complex
+ *	
+ *	6A709C0 0060	num params
+ *			0094	num commands
+ *			00BB	num params
+ *			00CC	params
+ *			016B	params
+ *			01FB	num params
+ *			020C	params
+ *			02B5	num commands
+ *	huge function with lots of references, patch
+ *	reuse of load address register makes this complex
+ *	
+ */
+
 enum CmdTablePatchType
 {
 	kPatchType_End = 0,
@@ -182,82 +244,44 @@ enum CmdTablePatchType
 
 HookedCommandTable::PatchInfo kCmdTableStartPatches[] =
 {
-	// +00
-	{ 0x0696E720 + 0x0D1D,		0x00, kPatchType_LeaToLoadBase },
+	{ 0x0696E720 + 0x0D1D + 0, 0, kPatchType_LeaToLoadBase },
 
-	{ 0x0696FE00 + 0x0033,		0x00, kPatchType_LeaToLoadBase },
+	{ 0x06972140 + 0x04C2 + 0, 0, kPatchType_LeaToLoadBase },
 
-	{ 0x06972140 + 0x04C2,		0x00, kPatchType_LeaToLoadBase },
+	{ 0x0698F100 + 0x006C + 0, 0, kPatchType_LeaToLoadBase },
 
-	{ 0x0698EDB0 + 0x0184,		0x00, kPatchType_LeaToLoadBase },	// this register is reused at +2DA, which is a debug-only string
-	{ 0x0698EDB0 + 0x018B + 4,	0x00, kPatchType_WriteOffset32 },
-	{ 0x0698EDB0 + 0x02DA,		0x00, kPatchType_FixupStringFetch },
-
-	{ 0x0698F100 + 0x006C,		0x00, kPatchType_LeaToLoadBase },
-
-	{ 0x06A35210 + 0x009B,		0x00, kPatchType_LeaToLoadBase },
-
-	{ 0x06A70820 + 0x000D,		0x00, kPatchType_LeaToLoadBase },
-
-	// do not patch 0x0696FC80 + 0x0025, used as end pointer for search over keywords
+	{ 0x06A35210 + 0x009B + 0, 0, kPatchType_LeaToLoadBase },
 	
-	{ 0x0696FC80 + 0x0066,		0x08, kPatchType_LeaToLoadBase },
+	{ 0x0696FC80 + 0x0066 + 0, 0x08, kPatchType_LeaToLoadBase },
 
-	{ 0x0696FC80 + 0x0122,		0x10, kPatchType_LeaToLoadBase },
-	{ 0x0696FC80 + 0x0129 + 3,	0x00, kPatchType_WriteOffset32 },
-
-	{ 0x06A70800 + 0x0011,		0x22, kPatchType_LeaToLoadBase },
-
-//	{ 0x06A70870 + 0x000A,		0x00, kPatchType_LeaToLoadBase },	// used to read multiple offsets, use base 0 for simplicity
-//	{ 0x06A70870 + 0x0018 + 5,	0x22, kPatchType_WriteOffset32 },
-//	{ 0x06A70870 + 0x0025 + 4,	0x28, kPatchType_WriteOffset32 },
-	// 0x06A70870 + 0x0037 needs special handling because it's reading a different array
-	// just reimplement 06A70870, see IsScriptCmdParamAReference
+	{ 0x0696FC80 + 0x0122 + 0, 0x10, kPatchType_LeaToLoadBase },
+	{ 0x0696FC80 + 0x0129 + 3, 0, kPatchType_WriteOffset32 },
 
 	{ 0, 0, kPatchType_End }
 };
 
 HookedCommandTable::PatchInfo kCmdTableEndPatches[] =
 {
-	{ 0x0696FC80 + 0x006D,		8, kPatchType_LeaToLoadBase },
+	{ 0x0696FC80 + 0x006D + 0, 0x08, kPatchType_LeaToLoadBase },
 
 	{ 0, 0, kPatchType_End }
 };
 
 HookedCommandTable::PatchInfo kCmdTableLenPatches[] =
 {
-	{ 0x0696FE00 + 0x0028 + 2, u32(-1), kPatchType_Data32 },
+	{ 0x06972140 + 0x04AF + 2, u32(-1), kPatchType_Data32 },
 
-	{ 0x06A35210 + 0x00A2 + 2,	0, kPatchType_Data32 },
-
-	{ 0x06A70800 + 0x0000 + 2,	0, kPatchType_Data32 },
-
-	{ 0x06A70820 + 0x0003 + 2,	0, kPatchType_Data32 },
-
-//	{ 0x06A70870 + 0x0000 + 2,	0, kPatchType_Data32 },	// replaced with hooked function
+	{ 0x06A35210 + 0x00A2 + 1, 0, kPatchType_Data32 },
 
 	{ 0, 0, kPatchType_End }
 };
 
 void HookedCommandTable::Apply(const PatchInfo * start, const PatchInfo * end, const PatchInfo * len)
 {
-	// todo: see if all of these can be replaced with reading pointers from the trampoline
-	// todo: or code hooks so the table can be dynamic (and not in the trampoline)
-	
-	// game code references the command table via many 32-bit displacements
-	// so it needs to go in the branch trampoline
-
-	size_t tableSize = m_commands.size() * sizeof(m_commands[0]);
-
-	_MESSAGE("command table size: %016I64X", tableSize);
-
-	m_trampolineCopy = (CommandInfo *)g_branchTrampoline.allocate(tableSize);
-	ASSERT(m_trampolineCopy);
-
-	std::copy(m_commands.begin(), m_commands.end(), m_trampolineCopy);
+	//
 }
 
-bool IsScriptCmdParamAReference(u32 scriptCmdIdx, u32 paramTypeIdx)
+bool IsScriptCmdParamAForm(u32 scriptCmdIdx, u32 paramTypeIdx)
 {
 	auto & cmdTable = g_commandTable;
 
@@ -270,17 +294,62 @@ bool IsScriptCmdParamAReference(u32 scriptCmdIdx, u32 paramTypeIdx)
 
 	u32 typeID = cmd->params[paramTypeIdx].typeID;
 
-	return g_paramTypeInfo[typeID].refType;
+	return g_paramTypeInfo[typeID].isForm;
 }
 
-RelocAddr <decltype(&IsScriptCmdParamAReference)> IsScriptCmdParamAReference_Original(0x06A70870);
+bool IsScriptCmdParamARefr(u32 scriptCmdIdx, u32 paramTypeIdx)
+{
+	auto & cmdTable = g_commandTable;
+
+	if(scriptCmdIdx >= cmdTable.NumCommands())
+		return false;
+
+	const auto * cmd = cmdTable.GetByIdx(scriptCmdIdx);
+	if(paramTypeIdx >= cmd->numParams)
+		return false;
+
+	u32 typeID = cmd->params[paramTypeIdx].typeID;
+
+	return (typeID == kParamType_ObjectRef) || (typeID == kParamType_Actor);
+}
+
+CommandInfo * GetCommandInfo(u32 opcode)
+{
+	u32 consoleCmdIdx = opcode - kScript_ConsoleOpBase;
+	if(consoleCmdIdx < kScript_NumConsoleCommands)
+		return &g_firstConsoleCommand[consoleCmdIdx];
+
+	u32 scriptCmdIdx = opcode - kScript_ScriptOpBase;
+	if(scriptCmdIdx < g_commandTable.NumCommands())
+		return g_commandTable.GetByIdx(scriptCmdIdx);
+
+	return nullptr;
+}
+
+u16 GetNumParameters(u32 cmdIdx)
+{
+	if(cmdIdx >= g_commandTable.NumCommands())
+		return 0;
+
+	return g_commandTable.GetByIdx(cmdIdx)->numParams;
+}
+
+RelocAddr <decltype(&IsScriptCmdParamAForm)> IsScriptCmdParamAForm_Original(0x06A70870);
+RelocAddr <decltype(&IsScriptCmdParamARefr)> IsScriptCmdParamARefr_Original(0x06A70820);
+RelocAddr <decltype(&GetCommandInfo)> GetCommandInfo_Original(0x0696FE00);
+RelocAddr <decltype(&GetNumParameters)> GetNumParameters_Original(0x06A70800);
 
 void Hooks_Script_Apply()
 {
+	ConsoleCommandInit_Hook();
+
 	g_commandTable.Init(kScript_ScriptOpBase, g_firstScriptCommand, kScript_NumScriptCommands);
 	g_commandTable.Extend(kScript_OBSEOpBase);
 
-	g_branchTrampoline.write6Branch(IsScriptCmdParamAReference_Original.getUIntPtr(), uintptr_t(IsScriptCmdParamAReference));
+	g_branchTrampoline.write6Branch(IsScriptCmdParamAForm_Original.getUIntPtr(), uintptr_t(IsScriptCmdParamAForm));
+	g_branchTrampoline.write6Branch(IsScriptCmdParamARefr_Original.getUIntPtr(), uintptr_t(IsScriptCmdParamARefr));
+	g_branchTrampoline.write6Branch(GetCommandInfo_Original.getUIntPtr(), uintptr_t(GetCommandInfo));
+	g_branchTrampoline.write6Branch(GetNumParameters_Original.getUIntPtr(), uintptr_t(GetNumParameters));
 
-	ConsoleCommandInit_Hook();
+	g_commandTable.Apply(kCmdTableStartPatches, kCmdTableEndPatches, kCmdTableLenPatches);
 }
