@@ -69,6 +69,8 @@ source_group(
 	FILES
 		AltarSync.cpp
 		AltarSync.h
+		AltarExtraData.cpp
+		AltarExtraData.h
 		STLTypes.h
 )
 
