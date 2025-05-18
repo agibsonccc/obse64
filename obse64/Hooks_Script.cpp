@@ -1,6 +1,7 @@
 #include "Hooks_Script.h"
 #include "obse64/GameConsole.h"
 #include "obse64/GameScript.h"
+#include "obse64/CommandTable.h"
 #include "obse64_common/SafeWrite.h"
 #include "obse64_common/obse64_version.h"
 #include "obse64_common/BranchTrampoline.h"
@@ -10,8 +11,6 @@
 #include "xbyak/xbyak.h"
 #include <vector>
 #include <map>
-
-RelocAddr <ParseFunction> DefaultParseFunction(0x06972980);
 
 bool PadCommand_Execute(const ParamInfo * paramInfo,
 	const char * scriptData,
@@ -105,18 +104,49 @@ public:
 	CommandInfo *	GetByIdx(u32 idx) { return &m_commands[idx]; }
 	CommandInfo *	GetByOpcode(u32 opcode) { return GetByIdx(opcode - m_baseOpcode); }
 
+	void	Add(const CommandInfo & cmd);
+
+	void	Lock() { m_locked = true; }
+
 private:
-	void	Apply(const PatchInfo * patch, uintptr_t baseValue);
+	enum
+	{
+		kContext_Start = 0,
+		kContext_End,
+		kContext_Len,
+
+		kContext_Num,
+	};
+
+	void	Apply(const PatchInfo * patch, uintptr_t baseValue, int context);
 
 	std::vector <CommandInfo>	m_commands;
 	u32	m_baseOpcode;
+	bool m_locked = false;
 
 	// pointers in the trampoline to m_commands.begin() + key (bytes)
 	// so we can do "mov reg, [reg + imm32]" to fetch them
-	std::map <u8, void **>	m_trampolineAddresses;
+	std::map <u8, void **>	m_trampolineAddresses[kContext_Num];
 };
 
 HookedCommandTable g_commandTable;
+
+void AddScriptCommand(const CommandInfo & cmd)
+{
+	g_commandTable.Add(cmd);
+}
+
+void HookedCommandTable::Add(const CommandInfo & cmd)
+{
+	ASSERT(!m_locked);
+
+	CommandInfo patchedCmd = cmd;
+
+	patchedCmd.opcode = u32(m_baseOpcode + m_commands.size());
+	if(!patchedCmd.parse) patchedCmd.parse = Cmd_Default_Parse;
+
+	m_commands.push_back(patchedCmd);
+}
 
 void HookedCommandTable::Init(u32 baseOpcode, const CommandInfo * ptr, u32 num)
 {
@@ -132,14 +162,13 @@ void HookedCommandTable::Extend(u32 opcode)
 	CommandInfo pad =
 	{
 		"", "",
-		0, 0,
+		0,
 		"empty padding cmd",
-		false, 0,
-		0, 0,
-		nullptr,
+		false,
+		0, nullptr,
 
 		PadCommand_Execute,
-		DefaultParseFunction,
+		Cmd_Default_Parse,
 		nullptr,
 
 		false, false
@@ -158,6 +187,7 @@ void HookedCommandTable::Extend(u32 opcode)
 /*** references to command table
  *	
  *	696E720	0D1D	base
+ *			0D0C	num commands - 1
  *	large function, patch
  *	
  *	6972140	04AF	num commands
@@ -175,6 +205,10 @@ void HookedCommandTable::Extend(u32 opcode)
  *			006D	end command short name
  *			0122	opcode (load imagebase)
  *			0129	opcode
+ *	simple patch
+ *	
+ *	6A29DA0	008A	num commands + 0x1000
+ *			01B9	num commands + 0x1000
  *	simple patch
  *	
  *	6A70820	0003	num commands
@@ -262,9 +296,8 @@ HookedCommandTable::PatchInfo kCmdTableStartPatches[] =
 
 	{ 0x06A35210 + 0x009B + 0, 0, kPatchType_LeaToLoadBase },
 	
-	{ 0x0696FC80 + 0x0066 + 0, 0x08, kPatchType_LeaToLoadBase },
-
-	{ 0x0696FC80 + 0x0122 + 0, 0x10, kPatchType_LeaToLoadBase },
+	{ 0x0696FC80 + 0x0066 + 0, offsetof(CommandInfo, shortName), kPatchType_LeaToLoadBase },
+	{ 0x0696FC80 + 0x0122 + 0, offsetof(CommandInfo, opcode), kPatchType_LeaToLoadBase },
 	{ 0x0696FC80 + 0x0129 + 3, 0, kPatchType_WriteOffset32 },
 
 	{ 0, 0, kPatchType_End }
@@ -272,16 +305,21 @@ HookedCommandTable::PatchInfo kCmdTableStartPatches[] =
 
 HookedCommandTable::PatchInfo kCmdTableEndPatches[] =
 {
-	{ 0x0696FC80 + 0x006D + 0, 0x08, kPatchType_LeaToLoadBase },
+	{ 0x0696FC80 + 0x006D + 0, offsetof(CommandInfo, shortName) + sizeof(CommandInfo), kPatchType_LeaToLoadBase },
 
 	{ 0, 0, kPatchType_End }
 };
 
 HookedCommandTable::PatchInfo kCmdTableLenPatches[] =
 {
+	{ 0x0696E720 + 0x0D0C + 1, u32(-1), kPatchType_Data32 },
+
 	{ 0x06972140 + 0x04AF + 2, u32(-1), kPatchType_Data32 },
 
 	{ 0x06A35210 + 0x00A2 + 1, 0, kPatchType_Data32 },
+
+	{ 0x06A29DA0 + 0x008A + 2, 0x1000, kPatchType_Data32 },
+	{ 0x06A29DA0 + 0x01B9 + 2, 0x1000, kPatchType_Data32 },
 
 	{ 0, 0, kPatchType_End }
 };
@@ -289,16 +327,16 @@ HookedCommandTable::PatchInfo kCmdTableLenPatches[] =
 void HookedCommandTable::Apply(const PatchInfo * start, const PatchInfo * end, const PatchInfo * len)
 {
 	for(const auto * iter = start; iter->type != kPatchType_End; ++iter)
-		Apply(iter, uintptr_t(&m_commands.front()));
+		Apply(iter, uintptr_t(&m_commands.front()), kContext_Start);
 
 	for(const auto * iter = end; iter->type != kPatchType_End; ++iter)
-		Apply(iter, uintptr_t(&m_commands.back()));
+		Apply(iter, uintptr_t(&m_commands.back()), kContext_End);
 
 	for(const auto * iter = len; iter->type != kPatchType_End; ++iter)
-		Apply(iter, m_commands.size());
+		Apply(iter, m_commands.size(), kContext_Len);
 }
 
-void HookedCommandTable::Apply(const PatchInfo * patch, uintptr_t baseValue)
+void HookedCommandTable::Apply(const PatchInfo * patch, uintptr_t baseValue, int context)
 {
 	uintptr_t rebasedPtr = RelocationManager::s_baseAddr + patch->ptr;
 
@@ -345,13 +383,30 @@ void HookedCommandTable::Apply(const PatchInfo * patch, uintptr_t baseValue)
 			//_MESSAGE("LeaToLoadBase: %08X %02X %02X %02X", patch->ptr, rex, opcode, modrm);
 
 			// get if it exists, insert empty entry if it doesn't
-			auto trampolineAddressIter = m_trampolineAddresses.try_emplace(patch->offset, nullptr);
+			auto trampolineAddressIter = m_trampolineAddresses[context].try_emplace(patch->offset, nullptr);
 			if(trampolineAddressIter.second)
 			{
 				// fill the new entry
 				void ** trampolinePtr = (void **)g_branchTrampoline.allocate();
 
-				*trampolinePtr = (u8 *)(&m_commands.front()) + patch->offset;
+				u8 * basePtr = nullptr;
+
+				switch(context)
+				{
+					case kContext_Start:
+						basePtr = (u8 *)&m_commands.front();
+						break;
+
+					case kContext_End:
+						basePtr = (u8 *)&m_commands.back();
+						break;
+
+					default:
+						ASSERT(false);
+						break;
+				}
+
+				*trampolinePtr = basePtr + patch->offset;
 
 				trampolineAddressIter.first->second = trampolinePtr;
 
@@ -449,6 +504,10 @@ void Hooks_Script_Apply()
 
 	g_commandTable.Init(kScript_ScriptOpBase, g_firstScriptCommand, kScript_NumScriptCommands);
 	g_commandTable.Extend(kScript_OBSEOpBase);
+
+	AddScriptCommands();
+
+	g_commandTable.Lock();
 
 	g_branchTrampoline.write6Branch(IsScriptCmdParamAForm_Original.getUIntPtr(), uintptr_t(IsScriptCmdParamAForm));
 	g_branchTrampoline.write6Branch(IsScriptCmdParamARefr_Original.getUIntPtr(), uintptr_t(IsScriptCmdParamARefr));

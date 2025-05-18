@@ -106,6 +106,8 @@ source_group(
 		PluginManager.h
 		SteamInit.cpp
 		SteamInit.h
+		CommandTable.cpp
+		CommandTable.h
 )
 
 # ---- Create library ----

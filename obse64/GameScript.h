@@ -98,12 +98,12 @@ struct CommandInfo
 	const char			* name;					// 00
 	const char			* shortName;			// 08
 	u32					opcode;					// 10
-	u32					pad14;					// 14
+//	u32					pad14;					// 14
 	const char			* helpText;				// 18
 	bool				needsParent;			// 20
-	u8					pad21;					// 21
+//	u8					pad21;					// 21
 	u16					numParams;				// 22
-	u32					pad24;					// 24
+//	u32					pad24;					// 24
 	ParamInfo			* params;				// 28
 
 	// handlers
@@ -114,10 +114,22 @@ struct CommandInfo
 	// flags
 	bool				editorFilter;			// 48
 	bool				invalidatesCellList;	// 49
-	u8					pad4A[6];				// 4A
+//	u8					pad4A[6];				// 4A
 };
 
 static_assert(sizeof(CommandInfo) == 0x50);
+
+bool Cmd_Default_Parse(u32 numParams, const ParamInfo * paramInfo, ScriptLineBuffer * lineBuf, ScriptBuffer * scriptBuf);
+typedef bool (* _ExtractArgs)(
+	const ParamInfo * paramInfo,
+	const char * scriptData,
+	u32 * opcodeOffsetPtr,
+	TESObjectREFR * thisObj,
+	TESObjectREFR * containingObj,
+	Script * script,
+	ScriptLocals * locals,
+	...);
+extern RelocAddr <_ExtractArgs> ExtractArgs;
 
 enum
 {
