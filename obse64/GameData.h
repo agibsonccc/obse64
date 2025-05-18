@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameTypes.h"
+#include "obse64_common/Utilities.h"
 
 // form data and io
 
@@ -80,6 +81,11 @@ public:
 	void						* unk1850;				// 1850
 	u8							unk1858;				// 1858
 	u8							pad1859[7];				// 1859
+
+	static TESDataHandler * GetSingleton();
+
+	MEMBER_FN_PREFIX(TESDataHandler);
+	DEFINE_MEMBER_FN(UnkInit, void, 0x06657600);
 };
 
 static_assert(sizeof(TESDataHandler) == 0x1860);

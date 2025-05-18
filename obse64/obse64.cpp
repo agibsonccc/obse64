@@ -13,6 +13,7 @@
 #include "Hooks_Script.h"
 #include "Hooks_Version.h"
 #include "Hooks_Gameplay.h"
+#include "Hooks_Data.h"
 
 HINSTANCE g_moduleHandle = nullptr;
 
@@ -147,6 +148,7 @@ void OBSE64_Initialize()
 	Hooks_Script_Apply();
 	Hooks_Version_Apply();
 	Hooks_Gameplay_Apply();
+	Hooks_Data_Apply();
 
 	FlushInstructionCache(GetCurrentProcess(), NULL, 0);
 

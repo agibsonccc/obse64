@@ -1,3 +1,7 @@
+0.2.0
+- obscript command table hooked
+- kMessage_DataLoaded for plugins
+
 0.1.0
 - forked from SFSE 0.2.16
 - support for 0.411.140.0

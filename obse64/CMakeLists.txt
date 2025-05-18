@@ -96,6 +96,8 @@ source_group(
 		Hooks_Version.h
 		Hooks_Gameplay.cpp
 		Hooks_Gameplay.h
+		Hooks_Data.cpp
+		Hooks_Data.h
 )
 
 source_group(
