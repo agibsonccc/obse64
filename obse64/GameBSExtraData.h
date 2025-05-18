@@ -116,7 +116,7 @@ public:
 //	void		** _vtbl;	// 00
 	u8			m_type;		// 08
 	u8			pad05[7];	// 09 lol
-	BSExtraData	* m_next;	// 08
+	BSExtraData	* m_next;	// 10
 };
 
 // 20
