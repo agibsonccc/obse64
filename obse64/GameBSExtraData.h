@@ -103,6 +103,9 @@ enum ExtraDataType
 	kExtraData_AltarData =				0x60,	// ExtraAltarData
 	kExtraData_AltarThreatLevel =		0x61,	// VExtraAltarThreatLevel
 	kExtraData_AltarBigWorldLeveledRgn =0x62,	// VExtraAltarBigWorldLeveledRegion
+
+	// for size of presence list
+	kExtraData_Max =					0x80,
 };
 
 // 18
@@ -125,12 +128,22 @@ class BaseExtraList
 public:
 	virtual ~BaseExtraList();
 
-//	void		** _vtbl;			// 00
-	BSExtraData	* m_data;			// 08
-	u8			m_presence[0x10];	// 10 starts from lsb, larger than original
+//	void		** _vtbl;	// 00
+	BSExtraData	* m_data;	// 08
+
+	u8	m_presence[kExtraData_Max / 8];	// 10 starts from lsb, larger than original
 
 	static void Lock();
 	static void Unlock();
+
+	template <typename T>
+	T * Get() const
+	{
+		return static_cast<T *>(Get(T::kID));
+	}
+
+	BSExtraData * Get(u8 type) const;
+	bool Contains(u8 type) const;
 
 	class Locker
 	{

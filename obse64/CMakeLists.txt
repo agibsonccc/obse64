@@ -62,6 +62,10 @@ source_group(
 		GameRTTI.inl
 		GameBSExtraData.cpp
 		GameBSExtraData.h
+		GameExtraData.cpp
+		GameExtraData.h
+		GameForms.h
+		GameObjects.h
 )
 
 source_group(
@@ -114,6 +118,12 @@ source_group(
 		SteamInit.h
 		CommandTable.cpp
 		CommandTable.h
+)
+
+source_group(
+	${PROJECT_NAME}/commands
+	FILES
+		Commands_Inventory.cpp
 )
 
 # ---- Create library ----
