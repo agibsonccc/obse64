@@ -9,6 +9,7 @@
 #include "obse64_common/Errors.h"
 #include "xbyak/xbyak.h"
 #include <vector>
+#include <map>
 
 RelocAddr <ParseFunction> DefaultParseFunction(0x06972980);
 
@@ -56,7 +57,7 @@ void ConsoleCommandInit_Hook()
 			cmd.name = "GetOBSEVersion";
 			cmd.shortName = "";
 			cmd.helpText = "";
-			cmd.needsParent = true;
+			cmd.needsParent = false;
 			cmd.numParams = 0;
 			cmd.execute = GetOBSEVersion_Execute;
 			cmd.editorFilter = false;
@@ -105,10 +106,14 @@ public:
 	CommandInfo *	GetByOpcode(u32 opcode) { return GetByIdx(opcode - m_baseOpcode); }
 
 private:
+	void	Apply(const PatchInfo * patch, uintptr_t baseValue);
+
 	std::vector <CommandInfo>	m_commands;
 	u32	m_baseOpcode;
 
-	CommandInfo	* m_trampolineCopy = nullptr;
+	// pointers in the trampoline to m_commands.begin() + key (bytes)
+	// so we can do "mov reg, [reg + imm32]" to fetch them
+	std::map <u8, void **>	m_trampolineAddresses;
 };
 
 HookedCommandTable g_commandTable;
@@ -193,11 +198,13 @@ void HookedCommandTable::Extend(u32 opcode)
  *			018B	base
  *	large function, patch
  *	reuse of load address register makes this complex
+ *	condition stuff, could ignore for now
  *
  *	6A708C0	0026	num params
  *			0037	params
- *	large function, patch
+ *	medium function, patch
  *	reuse of load address register makes this complex
+ *	more condition stuff
  *	
  *	6A709C0 0060	num params
  *			0094	num commands
@@ -209,6 +216,9 @@ void HookedCommandTable::Extend(u32 opcode)
  *			02B5	num commands
  *	huge function with lots of references, patch
  *	reuse of load address register makes this complex
+ *	more conditions
+ *	
+ *	all the annoying cases are conditions, look at that later
  *	
  */
 
@@ -278,7 +288,101 @@ HookedCommandTable::PatchInfo kCmdTableLenPatches[] =
 
 void HookedCommandTable::Apply(const PatchInfo * start, const PatchInfo * end, const PatchInfo * len)
 {
-	//
+	for(const auto * iter = start; iter->type != kPatchType_End; ++iter)
+		Apply(iter, uintptr_t(&m_commands.front()));
+
+	for(const auto * iter = end; iter->type != kPatchType_End; ++iter)
+		Apply(iter, uintptr_t(&m_commands.back()));
+
+	for(const auto * iter = len; iter->type != kPatchType_End; ++iter)
+		Apply(iter, m_commands.size());
+}
+
+void HookedCommandTable::Apply(const PatchInfo * patch, uintptr_t baseValue)
+{
+	uintptr_t rebasedPtr = RelocationManager::s_baseAddr + patch->ptr;
+
+	switch(patch->type)
+	{
+		case kPatchType_End:
+			break;
+
+		case kPatchType_Data16:
+		{
+			u16 newData = u16(baseValue + patch->offset);
+			safeWrite16(rebasedPtr, newData);
+		}
+		break;
+
+		case kPatchType_Data32:
+		{
+			u32 newData = u32(baseValue + patch->offset);
+			safeWrite32(rebasedPtr, newData);
+		}
+		break;
+
+		case kPatchType_LeaToLoadBase:
+		{
+			// simple bad disassembler
+			u8 * buf = (u8 *)rebasedPtr;
+			u8 rex = 0;
+
+			u8 opcode = *buf++;
+
+			if((opcode & 0xF0) == 0x40)
+			{
+				rex = opcode;
+				ASSERT(rex & 0x08);	// assume 64 bit operand size
+
+				opcode = *buf++;
+			}
+
+			u8 modrm = *buf++;
+
+			// no sib/mode3
+			ASSERT((modrm & 0x38) != 0x20);
+
+			//_MESSAGE("LeaToLoadBase: %08X %02X %02X %02X", patch->ptr, rex, opcode, modrm);
+
+			// get if it exists, insert empty entry if it doesn't
+			auto trampolineAddressIter = m_trampolineAddresses.try_emplace(patch->offset, nullptr);
+			if(trampolineAddressIter.second)
+			{
+				// fill the new entry
+				void ** trampolinePtr = (void **)g_branchTrampoline.allocate();
+
+				*trampolinePtr = (u8 *)(&m_commands.front()) + patch->offset;
+
+				trampolineAddressIter.first->second = trampolinePtr;
+
+				//_MESSAGE("allocated cmd table ptr %02X %016I64X (%016I64X)", patch->offset, trampolinePtr, *trampolinePtr);
+			}
+
+			// lea
+			ASSERT(opcode == 0x8D);
+
+			// MOV r64, r/m64
+			safeWrite8(rebasedPtr + (rex ? 1 : 0), 0x8B);
+
+			size_t displacementOffset = 2;
+			if(rex) displacementOffset++;
+
+			uintptr_t nextInstrAddr = rebasedPtr + displacementOffset + 4;
+			ptrdiff_t requiredDisplacement = uintptr_t(trampolineAddressIter.first->second) - nextInstrAddr;
+			ASSERT((requiredDisplacement >= INT_MIN) && (requiredDisplacement <= INT_MAX));
+
+			safeWrite32(rebasedPtr + displacementOffset, u32(requiredDisplacement));
+		}
+		break;
+
+		case kPatchType_WriteOffset32:
+			safeWrite32(rebasedPtr, patch->offset);
+			break;
+
+		case kPatchType_FixupStringFetch:
+			_MESSAGE("FixupStringFetch");
+			break;
+	}
 }
 
 bool IsScriptCmdParamAForm(u32 scriptCmdIdx, u32 paramTypeIdx)
