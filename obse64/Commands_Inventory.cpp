@@ -3,6 +3,7 @@
 #include "GameExtraData.h"
 #include "GameObjects.h"
 #include "GameRTTI.h"
+#include "ParamInfos.h"
 #include <vector>
 #include <map>
 
@@ -70,6 +71,56 @@ public:
 	ExtraContainerMap	m_map;
 };
 
+static TESForm * GetItemByIdx(TESObjectREFR * thisObj, u32 objIdx, s32 * outNumItems)
+{
+	if(!thisObj) return nullptr;
+
+	u32 count = 0;
+
+	auto * containerChanges = thisObj->extraList.Get<ExtraContainerChanges>();
+	ExtraContainerInfo info(containerChanges ? containerChanges->GetObjList() : nullptr);
+
+	TESContainer * container = nullptr;
+	TESForm * baseForm = thisObj->GetBaseForm();
+	if(baseForm)
+		container = DYNAMIC_CAST(baseForm, TESForm, TESContainer);
+
+	if(container)
+	{
+		for(auto * iter = &container->list.node; iter; iter = iter->m_next)
+		{
+			s32 numObjects = 0;
+			if(info.IsValidContainerData(iter->m_data, numObjects))
+			{
+				if(count == objIdx)
+				{
+					if(outNumItems) *outNumItems = numObjects;
+					return iter->m_data->type;
+				}
+				count++;
+			}
+		}
+	}
+
+	for(auto iter = info.m_vec.begin(); iter != info.m_vec.end(); ++iter)
+	{
+		auto * extraData = *iter;
+		if(extraData && extraData->countDelta > 0)
+		{
+			if(count == objIdx)
+			{
+				if(outNumItems) *outNumItems = extraData->countDelta;
+				return extraData->type;
+			}
+			count++;
+		}
+	}
+
+	if(outNumItems) *outNumItems = 0;
+
+	return nullptr;
+}
+
 bool Cmd_GetNumItems_Execute(COMMAND_ARGS)
 {
 	*result = 0;
@@ -108,6 +159,23 @@ bool Cmd_GetNumItems_Execute(COMMAND_ARGS)
 	return true;
 }
 
+bool Cmd_GetInventoryItemType_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	if(!thisObj) return true;
+
+	u32 objIdx = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &objIdx)) return true;
+
+	BaseExtraList::Locker lock;
+
+	if(TESForm * type = GetItemByIdx(thisObj, objIdx, nullptr))
+		*((u32 *)result) = type->refID;
+
+	return true;
+}
+
 CommandInfo kCommandInfo_GetNumItems =
 {
 	"GetNumItems", "gni",
@@ -116,4 +184,14 @@ CommandInfo kCommandInfo_GetNumItems =
 	1,
 	0, nullptr,
 	Cmd_GetNumItems_Execute,
+};
+
+CommandInfo kCommandInfo_GetInventoryItemType =
+{
+	"GetInventoryItemType", "giit",
+	0,
+	"returns a ref to the type of the inventory item",
+	1,
+	1, kParams_OneInt,
+	Cmd_GetInventoryItemType_Execute
 };

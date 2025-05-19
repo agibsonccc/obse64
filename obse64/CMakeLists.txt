@@ -119,6 +119,8 @@ source_group(
 		SteamInit.h
 		CommandTable.cpp
 		CommandTable.h
+		ParamInfos.cpp
+		ParamInfos.h
 )
 
 source_group(
