@@ -65,6 +65,7 @@ source_group(
 		GameBSExtraData.h
 		GameExtraData.cpp
 		GameExtraData.h
+		GameForms.cpp
 		GameForms.h
 		GameObjects.h
 )

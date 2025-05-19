@@ -51,3 +51,14 @@ struct NiTLargeArray
 };
 
 static_assert(sizeof(NiTLargeArray<void *>) == 0x20);
+
+// 10
+class BSStringT
+{
+public:
+	char	* m_data;	// 0
+	u16		m_dataLen;	// 8
+	u16		m_bufLen;	// A
+};
+
+static_assert(sizeof(BSStringT) == 0x10);
