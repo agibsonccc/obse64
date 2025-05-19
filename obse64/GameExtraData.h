@@ -26,7 +26,7 @@ public:
 	// 18
 	struct Data
 	{
-		BSSimpleList <Entry>	* objList;	// 00
+		BSSimpleList <Entry *>	* objList;	// 00
 		TESObjectREFR			* owner;	// 08
 
 		float	totalWeight;	// 10 of all items in inventory. cached, is -1 if needs to be recalculated
@@ -35,7 +35,7 @@ public:
 
 	Data	* data;	// 18
 
-	BSSimpleList <Entry> * GetObjList() const { return data ? data->objList : nullptr; }
+	BSSimpleList <Entry *> * GetObjList() const { return data ? data->objList : nullptr; }
 };
 
 static_assert(sizeof(ExtraContainerChanges) == 0x20);

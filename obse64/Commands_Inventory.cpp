@@ -14,7 +14,7 @@ typedef std::map <TESForm *, size_t> ExtraContainerMap;
 class ExtraContainerInfo
 {
 public:
-	ExtraContainerInfo(BSSimpleList <ExtraContainerChanges::Entry> * entryList)
+	ExtraContainerInfo(BSSimpleList <ExtraContainerChanges::Entry *> * entryList)
 	{
 		m_vec.reserve(128);
 
@@ -22,7 +22,7 @@ public:
 		{
 			for(auto * iter = &entryList->node; iter; iter = iter->m_next)
 			{
-				Accept(&iter->m_data);
+				Accept(iter->m_data);
 			}
 		}
 	}
