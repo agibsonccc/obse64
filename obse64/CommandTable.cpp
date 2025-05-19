@@ -61,4 +61,5 @@ void AddScriptCommands()
 	AddScriptCommand(kTestCommand);
 	AddScriptCommand(kTestArgCommand);
 	ADD(GetNumItems);
+	ADD(GetInventoryItemType);
 }
