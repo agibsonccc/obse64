@@ -54,8 +54,11 @@ static CommandInfo kTestArgCommand =
 	HANDLER(Cmd_TestArgs_Execute)
 };
 
+#define ADD(n) extern CommandInfo kCommandInfo_##n; AddScriptCommand(kCommandInfo_##n)
+
 void AddScriptCommands()
 {
 	AddScriptCommand(kTestCommand);
 	AddScriptCommand(kTestArgCommand);
+	ADD(GetNumItems);
 }

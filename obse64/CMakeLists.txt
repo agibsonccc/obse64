@@ -58,6 +58,7 @@ source_group(
 		GameData.h
 		GameTypes.cpp
 		GameTypes.h
+		GameRTTI.cpp
 		GameRTTI.h
 		GameRTTI.inl
 		GameBSExtraData.cpp

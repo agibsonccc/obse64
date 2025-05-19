@@ -51,3 +51,11 @@ public:
 };
 
 static_assert(sizeof(NiTMap<u32, u32>) == 0x20);
+
+// C
+struct NiPoint3
+{
+	float	x, y, z;
+};
+
+static_assert(sizeof(NiPoint3) == 0xC);

@@ -33,7 +33,9 @@ public:
 		float	armorWeight;	// 14 weight of equipped armor. cached as above. both take armor weight perks into account
 	};
 
-	Data	* m_data;	// 18
+	Data	* data;	// 18
+
+	BSSimpleList <Entry> * GetObjList() const { return data ? data->objList : nullptr; }
 };
 
 static_assert(sizeof(ExtraContainerChanges) == 0x20);

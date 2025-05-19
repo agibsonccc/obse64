@@ -18,7 +18,7 @@ bool PadCommand_Execute(const ParamInfo * paramInfo,
 	TESObjectREFR * containingObj,
 	Script * script,
 	ScriptLocals * locals,
-	float * result,
+	double * result,
 	u32 * opcodeOffsetPtr)
 {
 	return true;
@@ -30,7 +30,7 @@ bool GetOBSEVersion_Execute(const ParamInfo * paramInfo,
 	TESObjectREFR * containingObj,
 	Script * script,
 	ScriptLocals * locals,
-	float * result,
+	double * result,
 	u32 * opcodeOffsetPtr)
 {
 	_MESSAGE("GetOBSEVersion_Execute");

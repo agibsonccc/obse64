@@ -29,3 +29,23 @@ struct VAltarActorGUID
 };
 
 static_assert(sizeof(VAltarActorGUID) == 0x10);
+
+// 18
+class IVPairableItem
+{
+public:
+	virtual void	Pairable_0();
+	virtual void	Pairable_1();
+	virtual void	Pairable_2();
+	virtual void	Pairable_3();
+	virtual void	Pairable_4();
+	virtual void	Pairable_5();
+	virtual void	Pairable_6();
+
+//	void	** _vtbl;		// 00
+	u8		paired;			// 08
+	u8		pad09[7];		// 09
+	void	* pairObject;	// 10
+};
+
+static_assert(sizeof(IVPairableItem) == 0x18);
