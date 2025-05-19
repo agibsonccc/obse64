@@ -12,3 +12,5 @@ void Console_Print(const char* fmt, Args... args)
 	auto func = reinterpret_cast<func_t>(_Console_Print.getPtr());
 	return func(fmt, args...);
 }
+
+bool IsConsoleMode();

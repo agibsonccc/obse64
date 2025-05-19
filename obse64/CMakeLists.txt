@@ -127,6 +127,7 @@ source_group(
 	${PROJECT_NAME}/commands
 	FILES
 		Commands_Inventory.cpp
+		Commands_Input.cpp
 )
 
 # ---- Create library ----
