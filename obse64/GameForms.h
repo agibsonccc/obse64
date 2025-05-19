@@ -1,10 +1,26 @@
 #pragma once
 
 #include "GameTypes.h"
+#include "AltarSync.h"
+#include "GameBSExtraData.h"
 
+class TESForm;
 class TESFile;
 class TESObjectCELL;
+class TESObjectLAND;
+class TESObjectREFR;
 class TESObject;
+class TESSound;
+class TESPathGrid;
+class TESWorldSpace;
+class Script;
+class EnchantmentItem;
+class NiNode;
+
+const char * GetFullName(TESForm * baseForm);
+
+typedef TESForm * (* _LookupFormByID)(u32 id);
+extern RelocAddr <_LookupFormByID> LookupFormByID;
 
 // 08
 class BaseFormComponent
@@ -22,6 +38,148 @@ public:
 };
 
 static_assert(sizeof(BaseFormComponent) == 0x08);
+
+// 18
+class TESFullName : public BaseFormComponent
+{
+public:
+	BSStringT	name;	// 08
+};
+
+static_assert(sizeof(TESFullName) == 0x18);
+
+// 18
+class TESScriptableForm : public BaseFormComponent
+{
+public:
+	Script	* script;	// 8
+	u8		unk10;		// 10
+	u8		pad11[7];	// 11
+};
+
+static_assert(sizeof(TESScriptableForm) == 0x18);
+
+// 10
+class TESWeightForm : public BaseFormComponent
+{
+public:
+	float	weight;	// 08
+};
+
+static_assert(sizeof(TESWeightForm) == 0x10);
+
+// 10
+class TESValueForm : public BaseFormComponent
+{
+public:
+	u32	value;	// 08
+};
+
+static_assert(sizeof(TESValueForm) == 0x10);
+
+// 18
+class TESEnchantableForm : public BaseFormComponent
+{
+public:
+	EnchantmentItem	* enchantItem;	// 08
+	u16				enchantment;	// 10 max charge, valid only for weapons
+	u16				pad12;			// 12
+	u32				castingType;	// 14
+};
+
+static_assert(sizeof(TESEnchantableForm) == 0x18);
+
+// 10
+class TESHealthForm : public BaseFormComponent
+{
+public:
+	u32	health;	// 8
+};
+
+static_assert(sizeof(TESHealthForm) == 0x10);
+
+// 10
+class TESAttackDamageForm : public BaseFormComponent
+{
+public:
+	u16	damage;		// 8
+	u8	padA[6];	// A
+};
+
+static_assert(sizeof(TESAttackDamageForm) == 0x10);
+
+enum FormType
+{
+	kFormType_None = 0,
+	kFormType_TES4,
+	kFormType_Group,
+	kFormType_GMST,
+	kFormType_Global,
+	kFormType_Class,
+	kFormType_Faction,
+	kFormType_Hair,
+	kFormType_Eyes,
+	kFormType_Race,
+	kFormType_Sound,
+	kFormType_Skill,
+	kFormType_Effect,
+	kFormType_Script,
+	kFormType_LandTexture,
+	kFormType_Enchantment,
+	kFormType_Spell,		// 10
+	kFormType_BirthSign,
+	kFormType_Activator,
+	kFormType_Apparatus,
+	kFormType_Armor,
+	kFormType_Book,
+	kFormType_Clothing,
+	kFormType_Container,
+	kFormType_Door,
+	kFormType_Ingredient,
+	kFormType_Light,
+	kFormType_Misc,
+	kFormType_Stat,	// ???
+	kFormType_Grass,
+	kFormType_Tree,
+	kFormType_Flora,
+	kFormType_Furniture,	// 20
+	kFormType_Weapon,
+	kFormType_Ammo,
+	kFormType_NPC,
+	kFormType_Creature,
+	kFormType_LeveledCreature,
+	kFormType_SoulGem,
+	kFormType_Key,
+	kFormType_AlchemyItem,
+	kFormType_SubSpace,
+	kFormType_SigilStone,
+	kFormType_LeveledItem,
+	kFormType_SNDG,
+	kFormType_Weather,
+	kFormType_Climate,
+	kFormType_Region,
+	kFormType_Cell,			// 30
+	kFormType_REFR,
+	kFormType_ACHR,
+	kFormType_ACRE,
+	kFormType_PathGrid,
+	kFormType_WorldSpace,
+	kFormType_Land,
+	kFormType_TLOD,	// tile low lod?
+	kFormType_Road,
+	kFormType_Dialog,
+	kFormType_DialogInfo,
+	kFormType_Quest,
+	kFormType_Idle,
+	kFormType_Package,
+	kFormType_CombatStyle,
+	kFormType_LoadScreen,
+	kFormType_LeveledSpell,	// 40
+	kFormType_ANIO,
+	kFormType_WaterForm,
+	kFormType_EffectShader,
+	kFormType_TOFT
+};
 
 // 30
 class TESForm : public BaseFormComponent
@@ -94,6 +252,8 @@ public:
 	BSSimpleList <TESFile *>	modRefList;	// 18
 
 	void	* unk28;	// 28 new in altar
+
+	TESFullName * GetFullName();
 };
 
 static_assert(sizeof(TESForm) == 0x30);
@@ -133,6 +293,17 @@ public:
 };
 
 static_assert(sizeof(TESBoundObject) == 0x48);
+
+// 48
+class TESBoundAnimObject : public TESBoundObject
+{
+public:
+	virtual ~TESBoundAnimObject();
+
+	// size limited by TESSound
+};
+
+static_assert(sizeof(TESBoundAnimObject) == 0x48);
 
 // 20
 class TESContainer : public BaseFormComponent
@@ -280,6 +451,124 @@ public:
 	TESModel	bipedModel[2];		// 10
 	TESModel	groundModel[2];		// 70
 	TESIcon		icon[2];			// D0
+
+	u32 GetSlot() const { return SlotForMask(partMask); }
 };
 
 static_assert(sizeof(TESBipedModelForm) == 0x100);
+
+// 108
+class TESObjectLIGH : public TESBoundAnimObject
+{
+public:
+	enum
+	{
+		kLightFlags_Dynamic =		0x001,
+		kLightFlags_CanCarry =		0x002,
+		kLightFlags_Negative =		0x004,
+		kLightFlags_Flicker =		0x008,
+		kLightFlags_OffByDefault =	0x020,
+		kLightFlags_FlickerSlow =	0x040,
+		kLightFlags_Pulse =			0x080,
+		kLightFlags_PulseSlow =		0x100,
+		kLightFlags_SpotLight =		0x200,
+		kLightFlags_SpotShadow =	0x400
+	};
+
+	TESFullName			fullName;	// 48
+	TESModel			model;		// 60
+	TESIcon				icon;		// 90
+	TESScriptableForm	scriptable;	// A8
+	TESWeightForm		weight;		// C0
+	TESValueForm		value;		// D0
+
+	u32			time;			// E0
+	u32			radius;			// E4
+	u32			colorRGB;		// E8
+	u32			lightFlags;		// EC
+	float		falloff;		// F0
+	float		fov;			// F4
+	float		fade;			// F8
+	u32			padFC;			// FC
+	TESSound	* loopSound;	// 100
+
+	bool IsCarriable() const
+	{
+		return lightFlags & kLightFlags_CanCarry;
+	}
+};
+
+static_assert(sizeof(TESObjectLIGH) == 0x108);
+
+// 128
+class TESObjectWEAP : public TESBoundAnimObject
+{
+public:
+	enum
+	{
+		kType_BladeOneHand = 0,
+		kType_BladeTwoHand,
+		kType_BluntOneHand,
+		kType_BluntTwoHand,
+		kType_Staff,
+		kType_Bow,
+
+		kType_Max,
+	};
+
+	TESFullName			fullName;		// 048
+	TESModel			model;			// 060
+	TESIcon				icon;			// 090
+	TESScriptableForm	scriptable;		// 0A8
+	TESEnchantableForm	enchantable;	// 0C0
+	TESValueForm		value;			// 0D8
+	TESWeightForm		weight;			// 0E8
+	TESHealthForm		health;			// 0F8
+	TESAttackDamageForm	attackDmg;		// 108
+
+	u8		type;		// 118
+	float	speed;		// 11C
+	float	reach;		// 120
+	u8		flags;		// 124
+	u8		pad125[3];	// 125
+};
+
+static_assert(sizeof(TESObjectWEAP) == 0x128);
+
+// D8
+class TESObjectCELL : public TESForm
+{
+public:
+	struct CellCoordinates;
+	struct LightingData;
+
+	TESFullName	fullName;		// 30
+	IVPairableItem pairable;	// 48
+
+	// new in altar
+	u8	unk60;		// 60
+	u8	pad61[7];	// 61
+	BSSimpleList <TESForm *>	unk68;	// 68
+	u8	unk78;		// 78
+	// end new in altar
+
+	u8	flags0;		// 79
+	u8	flags1;		// 7A
+	u8	flags2;		// 7B
+	u32	pad7C;		// 7C
+
+	ExtraDataList	extraData;		// 80
+	union {
+		CellCoordinates * coords;	// if exterior
+		LightingData * lighting;	// if interior
+	};								// A0
+	TESObjectLAND	* land;			// A8
+	TESPathGrid		* pathGrid;		// B0
+
+	BSSimpleList <TESObjectREFR *>	objectList;	// B8
+
+	TESWorldSpace	* worldSpace;	// C8
+	NiNode			* unkD0;		// D0
+};
+
+static_assert(sizeof(TESObjectCELL) == 0xD8);

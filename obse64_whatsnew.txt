@@ -1,6 +1,8 @@
 0.2.0
 - obscript command table hooked
 - kMessage_DataLoaded for plugins
+- added GetNumItems, GetInventoryItemType, GetEquipmentSlotType
+- added (deprecated commands) IsKeyPressed
 
 0.1.0
 - forked from SFSE 0.2.16

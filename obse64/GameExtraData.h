@@ -2,10 +2,10 @@
 
 #include "GameBSExtraData.h"
 #include "GameTypes.h"
+#include "GameForms.h"
 
 class TESForm;
 class TESObjectREFR;
-class ExtraDataList;
 
 // 20
 class ExtraContainerChanges : public BSExtraData
@@ -41,3 +41,25 @@ public:
 static_assert(sizeof(ExtraContainerChanges) == 0x20);
 static_assert(sizeof(ExtraContainerChanges::Data) == 0x18);
 static_assert(sizeof(ExtraContainerChanges::Entry) == 0x18);
+
+// 20
+class ExtraMapMarker : public BSExtraData
+{
+public:
+	enum { kID = kExtraData_MapMarker };
+
+	// 20
+	struct Data
+	{
+		TESFullName	fullName;	// 00
+		u8			flags;		// 18
+		u8			pad19;		// 19
+		u16			type;		// 1A
+		u32			pad1C;		// 1C
+	};
+
+	Data * data;	// 18
+};
+
+static_assert(sizeof(ExtraMapMarker) == 0x20);
+static_assert(sizeof(ExtraMapMarker::Data) == 0x20);

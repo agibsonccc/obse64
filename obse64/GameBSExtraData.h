@@ -122,6 +122,8 @@ public:
 	BSExtraData	* m_next;	// 10
 };
 
+static_assert(sizeof(BSExtraData) == 0x18);
+
 // 20
 class BaseExtraList
 {
@@ -152,3 +154,12 @@ public:
 		~Locker() { BaseExtraList::Unlock(); }
 	};
 };
+
+static_assert(sizeof(BaseExtraList) == 0x20);
+
+// 20
+struct ExtraDataList : public BaseExtraList
+{
+};
+
+static_assert(sizeof(ExtraDataList) == 0x20);

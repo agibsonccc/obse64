@@ -1,6 +1,12 @@
 #include "GameForms.h"
+#include "GameRTTI.h"
+#include "GameObjects.h"
+#include "GameExtraData.h"
 
-enum {
+RelocAddr <_LookupFormByID> LookupFormByID(0x0663A630);
+
+enum
+{
 	kSlot_Head = 0x1 << TESBipedModelForm::kPart_Head,
 	kSlot_Hair = 0x1 << TESBipedModelForm::kPart_Hair,
 	kSlot_UpperBody = 0x1 << TESBipedModelForm::kPart_UpperBody,
@@ -87,4 +93,58 @@ u32 TESBipedModelForm::MaskForSlot(u32 slot)
 		default: break;
 	}
 	return mask;
+}
+
+const char * GetFullName(TESForm * baseForm)
+{
+	if(baseForm)
+	{
+		TESFullName * fullName = baseForm->GetFullName();
+		if(fullName && fullName->name.m_data)
+		{
+			if(fullName->name.m_dataLen)
+				return fullName->name.m_data;
+		}
+	}
+
+	return "<no name>";
+}
+
+TESFullName * TESForm::GetFullName()
+{
+	TESForm * form = this;
+	TESFullName * fullName = NULL;
+
+	auto * refr = DYNAMIC_CAST(form, TESForm, TESObjectREFR);
+	if(refr)
+	{
+		// deleted references will have a NULL base form, so check for that
+		if(refr->baseForm)
+		{
+			// is it a mapmarker?
+			if(refr->baseForm->typeID == kFormType_Stat)
+			{
+				auto * mapMarker = refr->extraList.Get<ExtraMapMarker>();
+				if(mapMarker && mapMarker->data)
+					fullName = &mapMarker->data->fullName;
+			}
+			else		// use base form
+				form = refr->baseForm;
+		}
+	}
+	else if(typeID == kFormType_Cell)	// some exterior cells inherit name of parent worldspace
+	{
+		// re-enable when TESObjectCELL is defined
+#if 0
+		TESObjectCELL * cell = DYNAMIC_CAST(this, TESForm, TESObjectCELL);
+		if(cell && cell->worldSpace)
+			if(!cell->fullName.name.m_data || !cell->fullName.name.m_dataLen)
+				form = cell->worldSpace;
+#endif
+	}
+
+	if(!fullName)
+		fullName = DYNAMIC_CAST(form, TESForm, TESFullName);
+
+	return fullName;
 }
