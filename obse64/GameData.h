@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameTypes.h"
+#include "NiTypes.h"
 #include "obse64_common/Utilities.h"
 
 // form data and io
