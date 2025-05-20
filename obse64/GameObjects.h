@@ -308,6 +308,7 @@ public:
 
 	MEMBER_FN_PREFIX(PlayerCharacter);
 	DEFINE_MEMBER_FN(GetActiveMagicItem, MagicItem *, 0x06622AF0);
+	DEFINE_MEMBER_FN(SetActiveSpell, void, 0x06630780, MagicItem *);
 };
 
 static_assert(sizeof(PlayerCharacter) == 0xB70);

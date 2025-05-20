@@ -67,4 +67,5 @@ void AddScriptCommands()
 	ADD(GetEquipmentSlotType);
 	ADD(PrintToConsole);
 	ADD_RET(GetActiveSpell, kRetnType_Form);
+	ADD_RET(SetActiveSpell, kRetnType_Form);
 }

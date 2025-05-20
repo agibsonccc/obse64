@@ -16,6 +16,8 @@ class TESWorldSpace;
 class Script;
 class EnchantmentItem;
 class NiNode;
+class ScriptEffectInfo;
+class EffectSetting;
 
 const char * GetFullName(TESForm * baseForm);
 
@@ -572,3 +574,115 @@ public:
 };
 
 static_assert(sizeof(TESObjectCELL) == 0xD8);
+
+// 38
+class EffectItem
+{
+public:
+	enum
+	{
+		kRange_Self = 0,
+		kRange_Touch,
+		kRange_Target,
+	};
+
+	virtual ~EffectItem();
+
+	virtual void	Unk_01();
+	virtual void	Unk_02();
+
+//	void	** _vtbl;	// 00
+	u32	effectCode;	// 08
+	u32	magnitude;	// 0C
+	u32	area;		// 10
+	u32	duration;	// 14
+	u32	range;		// 18
+	u32	actorValue;	// 1C
+
+	ScriptEffectInfo	* scriptEffectInfo;	// 20
+	EffectSetting		* setting;			// 28
+
+	float	cost;	// 30
+};
+
+// 20
+class EffectItemList
+{
+public:
+	virtual void	Unk_00();
+	virtual void	Unk_01();
+	virtual void	Unk_02();
+
+//	void	** _vtbl;	// 00
+	BSSimpleList <EffectItem *>	effects;	// 08
+	u32	numHostileEffects;	// 18
+	u32	pad1C;				// 1C
+};
+
+static_assert(sizeof(EffectItemList) == 0x20);
+
+// 60
+class MagicItem : public TESFullName
+{
+public:
+	EffectItemList	list;	// 18
+
+	// new in altar
+	u64	unk38[(0x60 - 0x38) / 8];	// 38
+};
+
+static_assert(sizeof(MagicItem) == 0x60);
+
+// 90
+class MagicItemForm : public TESForm
+{
+public:
+	virtual ~MagicItemForm();
+
+	MagicItem	magicItem;	// 30
+};
+
+static_assert(sizeof(MagicItemForm) == 0x90);
+
+// A0
+class SpellItem : public MagicItemForm
+{
+public:
+	enum
+	{
+		kType_Spell = 0,
+		kType_Disease,
+		kType_Power,
+		kType_LesserPower,
+		kType_Ability,
+		kType_All,
+	};
+
+	enum
+	{
+		kLevel_Novice = 0,
+		kLevel_Apprentice,
+		kLevel_Journeyman,
+		kLevel_Expert,
+		kLevel_Master,
+	};
+
+	enum
+	{
+		kFlag_NoAutoCalc = 0x1,
+		kFlag_PCStart = 0x4,
+		kFlag_ImmuneToSilence = 0xA,	// ### 2 bits?
+		kFlag_AreaEffectIgnoresLOS = 0x10,
+		kFlag_ScriptEffectAlwaysApplies = 0x20,
+		kFlag_DisallowAbsorbReflect = 0x40,
+		kFlag_TouchExplodesWithNoTarget = 0x80,
+	};
+
+	u32	spellType;		// 90
+	u32	magickaCost;	// 94
+	u32	masteryLevel;	// 98
+	u8	spellFlags;		// 9C
+	u8	pad9D[3];		// 9D
+};
+
+static_assert(sizeof(SpellItem) == 0xA0);
