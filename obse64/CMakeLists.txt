@@ -129,6 +129,7 @@ source_group(
 	FILES
 		Commands_Inventory.cpp
 		Commands_Input.cpp
+		Commands_Console.cpp
 )
 
 # ---- Create library ----

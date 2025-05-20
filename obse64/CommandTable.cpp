@@ -62,5 +62,7 @@ void AddScriptCommands()
 	AddScriptCommand(kTestArgCommand);
 	ADD(GetNumItems);
 	ADD(GetInventoryItemType);
+	ADD(IsKeyPressed);
 	ADD(GetEquipmentSlotType);
+	ADD(PrintToConsole);
 }
