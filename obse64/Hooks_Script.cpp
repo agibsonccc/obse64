@@ -104,9 +104,11 @@ public:
 	CommandInfo *	GetByIdx(u32 idx) { return &m_commands[idx]; }
 	CommandInfo *	GetByOpcode(u32 opcode) { return GetByIdx(opcode - m_baseOpcode); }
 
-	void	Add(const CommandInfo & cmd);
+	void	Add(const CommandInfo & cmd, CommandReturnType retnType = kRetnType_Default);
 
 	void	Lock() { m_locked = true; }
+
+	void	Reserve(size_t len);
 
 private:
 	enum
@@ -117,10 +119,16 @@ private:
 
 		kContext_Num,
 	};
+	
+	struct CmdExtraInfo
+	{
+		CommandReturnType	retnType = kRetnType_Default;
+	};
 
 	void	Apply(const PatchInfo * patch, uintptr_t baseValue, int context);
 
 	std::vector <CommandInfo>	m_commands;
+	std::vector <CmdExtraInfo>	m_cmdExtra;
 	u32	m_baseOpcode;
 	bool m_locked = false;
 
@@ -131,12 +139,12 @@ private:
 
 HookedCommandTable g_commandTable;
 
-void AddScriptCommand(const CommandInfo & cmd)
+void AddScriptCommand(const CommandInfo & cmd, CommandReturnType retnType)
 {
-	g_commandTable.Add(cmd);
+	g_commandTable.Add(cmd, retnType);
 }
 
-void HookedCommandTable::Add(const CommandInfo & cmd)
+void HookedCommandTable::Add(const CommandInfo & cmd, CommandReturnType retnType)
 {
 	ASSERT(!m_locked);
 
@@ -146,6 +154,17 @@ void HookedCommandTable::Add(const CommandInfo & cmd)
 	if(!patchedCmd.parse) patchedCmd.parse = Cmd_Default_Parse;
 
 	m_commands.push_back(patchedCmd);
+
+	CmdExtraInfo extra;
+	extra.retnType = retnType;
+
+	m_cmdExtra.push_back(extra);
+}
+
+void HookedCommandTable::Reserve(size_t len)
+{
+	m_commands.reserve(len);
+	m_cmdExtra.reserve(len);
 }
 
 void HookedCommandTable::Init(u32 baseOpcode, const CommandInfo * ptr, u32 num)
@@ -153,6 +172,9 @@ void HookedCommandTable::Init(u32 baseOpcode, const CommandInfo * ptr, u32 num)
 	m_baseOpcode = baseOpcode;
 
 	m_commands.assign(ptr, ptr + num);
+
+	CmdExtraInfo extra;
+	m_cmdExtra.assign(num, extra);
 }
 
 void HookedCommandTable::Extend(u32 opcode)
@@ -175,13 +197,10 @@ void HookedCommandTable::Extend(u32 opcode)
 	};
 
 	u32 commandsToAdd = opcode - lastOpcode + 1;
-	m_commands.reserve(m_commands.size() + commandsToAdd);
+	Reserve(m_commands.size() + commandsToAdd);
 
 	for(u32 i = lastOpcode + 1; i < opcode; i++)
-	{
-		pad.opcode = i;
-		m_commands.push_back(pad);
-	}
+		Add(pad);
 }
 
 /*** references to command table
