@@ -3,6 +3,7 @@
 - kMessage_DataLoaded for plugins
 - added GetNumItems, GetInventoryItemType, GetEquipmentSlotType
 - added (deprecated commands) IsKeyPressed
+- implemented up to classic OBSE release 3 for what it's worth
 
 0.1.0
 - forked from SFSE 0.2.16
