@@ -1,7 +1,7 @@
 0.2.0
 - obscript command table hooked
 - kMessage_DataLoaded for plugins
-- added GetNumItems, GetInventoryItemType, GetEquipmentSlotType
+- added GetNumItems, GetInventoryItemType, GetEquipmentSlotType, PrintToConsole, GetActiveSpell
 - added (deprecated commands) IsKeyPressed
 - implemented up to classic OBSE release 3 for what it's worth
 

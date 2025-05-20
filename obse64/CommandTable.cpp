@@ -55,6 +55,7 @@ static CommandInfo kTestArgCommand =
 };
 
 #define ADD(n) extern CommandInfo kCommandInfo_##n; AddScriptCommand(kCommandInfo_##n)
+#define ADD_RET(n, r) extern CommandInfo kCommandInfo_##n; AddScriptCommand(kCommandInfo_##n, r)
 
 void AddScriptCommands()
 {
@@ -65,4 +66,5 @@ void AddScriptCommands()
 	ADD(IsKeyPressed);
 	ADD(GetEquipmentSlotType);
 	ADD(PrintToConsole);
+	ADD_RET(GetActiveSpell, kRetnType_Form);
 }

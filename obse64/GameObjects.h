@@ -4,9 +4,11 @@
 #include "GameForms.h"
 #include "GameBSExtraData.h"
 #include "AltarSync.h"
+#include "obse64_common/Utilities.h"
 
 class NiNode;
 class BaseProcess;
+class MagicItem;
 
 // 8
 class TESChildCell
@@ -301,6 +303,11 @@ public:
 	virtual ~PlayerCharacter();
 
 	u64	unk328[(0xB70 - 0x328) / 8];
+
+	static PlayerCharacter * Get();
+
+	MEMBER_FN_PREFIX(PlayerCharacter);
+	DEFINE_MEMBER_FN(GetActiveMagicItem, MagicItem *, 0x06622AF0);
 };
 
 static_assert(sizeof(PlayerCharacter) == 0xB70);

@@ -67,6 +67,7 @@ source_group(
 		GameExtraData.h
 		GameForms.cpp
 		GameForms.h
+		GameObjects.cpp
 		GameObjects.h
 )
 
@@ -130,6 +131,7 @@ source_group(
 		Commands_Inventory.cpp
 		Commands_Input.cpp
 		Commands_Console.cpp
+		Commands_Player.cpp
 )
 
 # ---- Create library ----
