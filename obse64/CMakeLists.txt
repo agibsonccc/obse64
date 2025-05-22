@@ -132,6 +132,7 @@ source_group(
 		Commands_Input.cpp
 		Commands_Console.cpp
 		Commands_Player.cpp
+		Commands_Math.cpp
 )
 
 # ---- Create library ----

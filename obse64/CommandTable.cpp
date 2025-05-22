@@ -68,4 +68,13 @@ void AddScriptCommands()
 	ADD(PrintToConsole);
 	ADD_RET(GetActiveSpell, kRetnType_Form);
 	ADD_RET(SetActiveSpell, kRetnType_Form);
+	ADD(SquareRoot);
+	ADD(Sin);
+	ADD(Cos);
+	ADD(Tan);
+	ADD(ASin);
+	ADD(ACos);
+	ADD(ATan);
+	ADD(Log);
+	ADD(Exp);
 }
