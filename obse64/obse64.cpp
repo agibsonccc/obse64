@@ -1,3 +1,5 @@
+#define _CRT_RAND_S
+#include <stdlib.h>
 #include <Windows.h>
 #include <ShlObj.h>
 #include <corecrt_startup.h>
@@ -9,6 +11,7 @@
 #include "obse64_common/CoreInfo.h"
 #include "PluginManager.h"
 #include "SteamInit.h"
+#include "MersenneTwister.h"
 
 #include "Hooks_Script.h"
 #include "Hooks_Version.h"
@@ -151,6 +154,18 @@ void OBSE64_Initialize()
 	Hooks_Data_Apply();
 
 	FlushInstructionCache(GetCurrentProcess(), NULL, 0);
+
+	{
+		const int kRNGSeedLen = 4;
+
+		u32 seed[kRNGSeedLen];
+
+		for(int i = 0; i < kRNGSeedLen; i++)
+			rand_s(&seed[i]);
+
+		static_assert(sizeof(unsigned long) == sizeof(u32));
+		MersenneTwister::init_by_array((unsigned long *)seed, kRNGSeedLen);
+	}
 
 	_MESSAGE("init complete");
 

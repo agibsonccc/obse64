@@ -1,5 +1,6 @@
 #include "GameScript.h"
 #include "ParamInfos.h"
+#include "MersenneTwister.h"
 
 template <float (* Fn)(float)>
 bool UnaryMathFn(COMMAND_ARGS)
@@ -99,4 +100,60 @@ CommandInfo kCommandInfo_Exp =
 	0, "", 0,
 	1, kParams_OneFloat,
 	&UnaryMathFn <expf>
+};
+
+CommandInfo kCommandInfo_Log10 =
+{
+	"Exp", "exp",
+	0, "", 0,
+	1, kParams_OneFloat,
+	&UnaryMathFn <log10f>
+};
+
+CommandInfo kCommandInfo_Floor =
+{
+	"Floor", "flr",
+	0, "", 0,
+	1, kParams_OneFloat,
+	&UnaryMathFn <floorf>
+};
+
+CommandInfo kCommandInfo_Ceil =
+{
+	"Ceil", "ceil",
+	0, "", 0,
+	1, kParams_OneFloat,
+	&UnaryMathFn <ceilf>
+};
+
+CommandInfo kCommandInfo_Abs =
+{
+	"Abs", "abs",
+	0, "", 0,
+	1, kParams_OneFloat,
+	&UnaryMathFn <fabsf>
+};
+
+float FloatRand(float min, float max)
+{
+	if(max < min)
+	{
+		float temp = min;
+		min = max;
+		max = temp;
+	}
+
+	float range = max - min;
+
+	double value = MersenneTwister::genrand_real2() * range;
+
+	return float(value + min);
+}
+
+CommandInfo kCommandInfo_Rand =
+{
+	"Rand", "r",
+	0, "", 0,
+	2, kParams_TwoFloats,
+	&BinaryMathFn <FloatRand>
 };

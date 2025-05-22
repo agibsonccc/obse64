@@ -123,6 +123,8 @@ source_group(
 		CommandTable.h
 		ParamInfos.cpp
 		ParamInfos.h
+		MersenneTwister.cpp
+		MersenneTwister.h
 )
 
 source_group(

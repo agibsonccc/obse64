@@ -78,4 +78,9 @@ void AddScriptCommands()
 	ADD(Log);
 	ADD(Exp);
 	ADD(GetParentCell);
+	ADD(Log10);
+	ADD(Floor);
+	ADD(Ceil);
+	ADD(Abs);
+	ADD(Rand);
 }
