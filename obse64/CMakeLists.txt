@@ -133,6 +133,7 @@ source_group(
 		Commands_Console.cpp
 		Commands_Player.cpp
 		Commands_Math.cpp
+		Commands_MiscReference.cpp
 )
 
 # ---- Create library ----

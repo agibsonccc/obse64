@@ -77,4 +77,5 @@ void AddScriptCommands()
 	ADD(ATan);
 	ADD(Log);
 	ADD(Exp);
+	ADD(GetParentCell);
 }
