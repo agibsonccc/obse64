@@ -6,12 +6,12 @@
 
 #define HANDLER(x) x
 
-bool Cmd_Test_Execute(COMMAND_ARGS)
+static bool Cmd_Test_Execute(COMMAND_ARGS)
 {
 	return true;
 }
 
-bool Cmd_TestArgs_Execute(COMMAND_ARGS)
+static bool Cmd_TestArgs_Execute(COMMAND_ARGS)
 {
 	u32	arg;
 
@@ -98,4 +98,21 @@ void AddScriptCommands()
 	ADD(dSinh);
 	ADD(dCosh);
 	ADD(dTanh);
+	ADD_RET(GetInventoryObject, kRetnType_Form);
+	ADD_RET(GetEquippedObject, kRetnType_Form);
+	ADD(IsKeyPressed2);
+	ADD(TapKey);
+	ADD(HoldKey);
+	ADD(ReleaseKey);
+	ADD(HammerKey);
+	ADD(AHammerKey);
+	ADD(UnHammerKey);
+	ADD(DisableKey);
+	ADD(EnableKey);
+	ADD(MoveMouseX);
+	ADD(MoveMouseY);
+	ADD(SetMouseSpeedX);
+	ADD(SetMouseSpeedY);
+	ADD(DisableMouse);
+	ADD(EnableMouse);
 }

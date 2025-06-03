@@ -455,3 +455,25 @@ CommandInfo kCommandInfo_GetEquipmentSlotType =
 	1, kParams_OneInt,
 	Cmd_GetEquipmentSlotType_Execute
 };
+
+// intentionally the same as GetInventoryItemType
+CommandInfo kCommandInfo_GetInventoryObject =
+{
+	"GetInventoryObject", "GetInvObj",
+	0,
+	"returns the base object for the item in the specified inventory index",
+	1,
+	1, kParams_OneInt,
+	Cmd_GetInventoryItemType_Execute
+};
+
+// intentionally the same as GetEquipmentSlotType
+CommandInfo kCommandInfo_GetEquippedObject =
+{
+	"GetEquippedObject", "GetEqObj",
+	0,
+	"returns the base object of the item in the specified equipment slot",
+	1,
+	1, kParams_OneInt,
+	Cmd_GetEquipmentSlotType_Execute
+};
