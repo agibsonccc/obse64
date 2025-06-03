@@ -83,4 +83,19 @@ void AddScriptCommands()
 	ADD(Ceil);
 	ADD(Abs);
 	ADD(Rand);
+	ADD(Pow);
+	ADD(ATan2);
+	ADD(Sinh);
+	ADD(Cosh);
+	ADD(Tanh);
+	ADD(dSin);
+	ADD(dCos);
+	ADD(dTan);
+	ADD(dASin);
+	ADD(dACos);
+	ADD(dATan);
+	ADD(dATan2);
+	ADD(dSinh);
+	ADD(dCosh);
+	ADD(dTanh);
 }
