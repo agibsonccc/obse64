@@ -2,6 +2,8 @@
 #include "GameScript.h"
 #include "Hooks_Script.h"
 #include "obse64_common/Log.h"
+#include "obse64_common/obse64_version.h"
+#include "obse64_common/Errors.h"
 #include "GameConsole.h"
 
 #define HANDLER(x) x
@@ -52,6 +54,49 @@ static CommandInfo kTestArgCommand =
 	1, kTestArgCommand_Params,
 
 	HANDLER(Cmd_TestArgs_Execute)
+};
+
+void ImportConsoleCommand(const char * name)
+{
+	for(u32 i = 0; i < kScript_NumConsoleCommands; i++)
+	{
+		auto & cmd = g_firstConsoleCommand[i];
+
+		if(!_stricmp(name, cmd.name))
+		{
+			AddScriptCommand(cmd);
+
+			return;
+		}
+	}
+
+	HALT("couldn't find console cmd");
+}
+
+static bool Cmd_GetOBSEVersion_Execute(COMMAND_ARGS)
+{
+	// the classic OBSE version we are pretending to be
+	*result = OBSE_VERSION_IMPL_INTEGER;
+
+	if(IsConsoleMode())
+	{
+		Console_Print("OBSE64 version: %d.%d.%d, release idx %d, runtime %08X, reported version %d",
+			OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA,
+			OBSE_VERSION_RELEASEIDX, RUNTIME_VERSION, OBSE_VERSION_IMPL_INTEGER);
+	}
+
+	return true;
+}
+
+static CommandInfo kCommandInfo_GetOBSEVersion =
+{
+	"GetOBSEVersion", "",
+	0,
+	"returns the installed version of OBSE",
+	0,
+	0, nullptr,
+
+	Cmd_GetOBSEVersion_Execute,
 };
 
 #define ADD(n) extern CommandInfo kCommandInfo_##n; AddScriptCommand(kCommandInfo_##n)
@@ -115,4 +160,26 @@ void AddScriptCommands()
 	ADD(SetMouseSpeedY);
 	ADD(DisableMouse);
 	ADD(EnableMouse);
+	ADD(GetOBSEVersion);
+	ImportConsoleCommand("SetGameSetting");
+	ImportConsoleCommand("SetINISetting");
+	ImportConsoleCommand("GetINISetting");
+	ImportConsoleCommand("SetFog");
+	ImportConsoleCommand("SetClipDist");
+	ImportConsoleCommand("SetImageSpaceGlow");
+	ImportConsoleCommand("ToggleDetection");
+	ImportConsoleCommand("SetCameraFOV");
+	ImportConsoleCommand("SexChange");
+	ImportConsoleCommand("RefreshINI");
+	ImportConsoleCommand("HairTint");
+	ImportConsoleCommand("SetTargetRefraction");
+	ImportConsoleCommand("SetTargetRefractionFire");
+	ImportConsoleCommand("SetSkyParam");
+	ImportConsoleCommand("RunMemoryPass");
+	ImportConsoleCommand("ModWaterShader");
+	ImportConsoleCommand("WaterShallowColor");
+	ImportConsoleCommand("WaterDeepColor");
+	ImportConsoleCommand("WaterReflectionColor");
+	ImportConsoleCommand("SetGamma");
+	ImportConsoleCommand("SetHDRParam");
 }

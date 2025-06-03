@@ -3,7 +3,9 @@
 - kMessage_DataLoaded for plugins
 - added GetNumItems, GetInventoryItemType, GetEquipmentSlotType, PrintToConsole, GetActiveSpell
 - added (deprecated commands) IsKeyPressed
-- implemented up to classic OBSE release 3 for what it's worth
+- added (stubbed) input commands; these need a major rework for how input happens
+- several imported console commands for use in scripts
+- implemented up to classic OBSE release 6
 
 0.1.0
 - forked from SFSE 0.2.16

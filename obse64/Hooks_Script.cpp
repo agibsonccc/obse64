@@ -24,49 +24,6 @@ bool PadCommand_Execute(const ParamInfo * paramInfo,
 	return true;
 }
 
-bool GetOBSEVersion_Execute(const ParamInfo * paramInfo,
-	const char * scriptData,
-	TESObjectREFR * thisObj,
-	TESObjectREFR * containingObj,
-	Script * script,
-	ScriptLocals * locals,
-	double * result,
-	u32 * opcodeOffsetPtr)
-{
-	_MESSAGE("GetOBSEVersion_Execute");
-
-	Console_Print("OBSE64 version: %d.%d.%d, release idx %d, runtime %08X",
-		OBSE_VERSION_INTEGER, OBSE_VERSION_INTEGER_MINOR, OBSE_VERSION_INTEGER_BETA,
-		OBSE_VERSION_RELEASEIDX, RUNTIME_VERSION);
-
-	return true;
-}
-
-void ConsoleCommandInit_Hook()
-{
-	for (CommandInfo * iter = g_firstConsoleCommand; iter->opcode < (kScript_NumConsoleCommands + kScript_ConsoleOpBase); ++iter)
-	{
-		if (!iter->execute)
-			continue;
-
-		if (!strcmp(iter->name, "WasteMemory"))
-		{
-			CommandInfo & cmd = *iter;
-
-			cmd.name = "GetOBSEVersion";
-			cmd.shortName = "";
-			cmd.helpText = "";
-			cmd.needsParent = false;
-			cmd.numParams = 0;
-			cmd.execute = GetOBSEVersion_Execute;
-			cmd.editorFilter = false;
-			cmd.invalidatesCellList = false;
-
-			break;
-		}
-	}
-}
-
 // 8
 struct ParamTypeInfo
 {
@@ -519,8 +476,6 @@ RelocAddr <decltype(&GetNumParameters)> GetNumParameters_Original(0x06A70800);
 
 void Hooks_Script_Apply()
 {
-	ConsoleCommandInit_Hook();
-
 	g_commandTable.Init(kScript_ScriptOpBase, g_firstScriptCommand, kScript_NumScriptCommands);
 	g_commandTable.Extend(kScript_OBSEOpBase);
 

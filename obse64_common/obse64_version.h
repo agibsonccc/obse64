@@ -9,6 +9,9 @@
 #define OBSE_VERSION_PADDEDSTRING	"0001"
 #define OBSE_VERSION_RELEASEIDX		1
 
+// the version of classic OBSE currently implemented
+#define OBSE_VERSION_IMPL_INTEGER	6
+
 //	x-------	major
 //	-xxx----	minor
 //	----xxx-	build
