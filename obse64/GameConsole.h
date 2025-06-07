@@ -3,7 +3,7 @@
 #include "obse64_common/Relocation.h"
 #include "obse64_common/Utilities.h"
 
-inline RelocPtr <std::uintptr_t> _Console_Print(0x06593FA0);
+extern RelocPtr <std::uintptr_t> _Console_Print;
 
 template <class... Args>
 void Console_Print(const char* fmt, Args... args)
