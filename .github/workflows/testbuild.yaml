@@ -12,7 +12,7 @@ jobs:
             - uses: svenstaro/upload-release-action@v2
               with:
                 repo_token: ${{ secrets.GITHUB_TOKEN }}
-                file: C:\a\obse64\obse64\obse64\build\obse64\Release\*
+                file: obse64\build\obse64\Release\*
                 tag: ${{ github.ref }}
                 overwrite: true
                 file_glob: true
