@@ -9,7 +9,6 @@ jobs:
                 path: obse64
             - run: cmake -B obse64/build -S obse64 -DCMAKE_INSTALL_PREFIX=extern obse64
             - run: cmake --build obse64/build --config Release
-            - name: Upload binaries to release
             - uses: svenstaro/upload-release-action@v2
               with:
                 repo_token: ${{ secrets.GITHUB_TOKEN }}
