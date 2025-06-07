@@ -1,18 +1,57 @@
-name: testbuild
-on: [push]
+name: Build and Release
+on: 
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
 jobs:
-    run-testbuild:
-        runs-on: windows-latest
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                path: obse64
-            - run: cmake -B obse64/build -S obse64 -DCMAKE_INSTALL_PREFIX=extern obse64
-            - run: cmake --build obse64/build --config Release
-            - uses: svenstaro/upload-release-action@v2
-              with:
-                repo_token: ${{ secrets.GITHUB_TOKEN }}
-                file: .*
-                tag: ${{ github.ref }}
-                overwrite: true
-                file_glob: true
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: .
+      
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v2
+      
+      - name: Configure CMake
+        run: |
+          cmake -B build -S . -DCMAKE_INSTALL_PREFIX=install -DRUNTIME_VERSION=0x019B08C0
+      
+      - name: Build
+        run: |
+          cmake --build build --config Release
+      
+      - name: Install
+        run: |
+          cmake --install build --config Release
+      
+      - name: List build artifacts
+        run: |
+          echo "=== Build directory contents ==="
+          Get-ChildItem -Recurse build | Where-Object { $_.Extension -eq ".dll" -or $_.Extension -eq ".exe" } | ForEach-Object { Write-Host $_.FullName }
+          echo "=== Install directory contents ==="
+          Get-ChildItem -Recurse install -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".dll" -or $_.Extension -eq ".exe" } | ForEach-Object { Write-Host $_.FullName }
+        shell: pwsh
+      
+      - name: Upload main DLL artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: obse64-dll-release
+          path: |
+            build/obse64/Release/obse64_*.dll
+            build/obse64_loader/Release/obse64_loader.exe
+          if-no-files-found: error
+      
+      - name: Upload all artifacts (debug)
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-build-artifacts
+          path: |
+            build/**/*.dll
+            build/**/*.exe
+            build/**/*.pdb
+          if-no-files-found: warn
